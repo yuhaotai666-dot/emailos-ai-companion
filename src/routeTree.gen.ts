@@ -24,7 +24,6 @@ import { Route as AppMemoryRouteImport } from './routes/_app.memory'
 import { Route as AppMeetingsRouteImport } from './routes/_app.meetings'
 import { Route as AppInboxRouteImport } from './routes/_app.inbox'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
-import { Route as AppFollowUpsRouteImport } from './routes/_app.follow-ups'
 import { Route as AppDraftsRouteImport } from './routes/_app.drafts'
 import { Route as AppPeoplePersonIdRouteImport } from './routes/_app.people.$personId'
 
@@ -102,11 +101,6 @@ const AppHomeRoute = AppHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AppRoute,
 } as any)
-const AppFollowUpsRoute = AppFollowUpsRouteImport.update({
-  id: '/follow-ups',
-  path: '/follow-ups',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppDraftsRoute = AppDraftsRouteImport.update({
   id: '/drafts',
   path: '/drafts',
@@ -122,7 +116,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRouteWithChildren
   '/drafts': typeof AppDraftsRoute
-  '/follow-ups': typeof AppFollowUpsRoute
   '/home': typeof AppHomeRoute
   '/inbox': typeof AppInboxRoute
   '/meetings': typeof AppMeetingsRoute
@@ -140,7 +133,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/drafts': typeof AppDraftsRoute
-  '/follow-ups': typeof AppFollowUpsRoute
   '/home': typeof AppHomeRoute
   '/inbox': typeof AppInboxRoute
   '/meetings': typeof AppMeetingsRoute
@@ -161,7 +153,6 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/onboarding': typeof OnboardingRouteWithChildren
   '/_app/drafts': typeof AppDraftsRoute
-  '/_app/follow-ups': typeof AppFollowUpsRoute
   '/_app/home': typeof AppHomeRoute
   '/_app/inbox': typeof AppInboxRoute
   '/_app/meetings': typeof AppMeetingsRoute
@@ -182,7 +173,6 @@ export interface FileRouteTypes {
     | '/'
     | '/onboarding'
     | '/drafts'
-    | '/follow-ups'
     | '/home'
     | '/inbox'
     | '/meetings'
@@ -200,7 +190,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/drafts'
-    | '/follow-ups'
     | '/home'
     | '/inbox'
     | '/meetings'
@@ -220,7 +209,6 @@ export interface FileRouteTypes {
     | '/_app'
     | '/onboarding'
     | '/_app/drafts'
-    | '/_app/follow-ups'
     | '/_app/home'
     | '/_app/inbox'
     | '/_app/meetings'
@@ -349,13 +337,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHomeRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/follow-ups': {
-      id: '/_app/follow-ups'
-      path: '/follow-ups'
-      fullPath: '/follow-ups'
-      preLoaderRoute: typeof AppFollowUpsRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/drafts': {
       id: '/_app/drafts'
       path: '/drafts'
@@ -387,7 +368,6 @@ const AppPeopleRouteWithChildren = AppPeopleRoute._addFileChildren(
 
 interface AppRouteChildren {
   AppDraftsRoute: typeof AppDraftsRoute
-  AppFollowUpsRoute: typeof AppFollowUpsRoute
   AppHomeRoute: typeof AppHomeRoute
   AppInboxRoute: typeof AppInboxRoute
   AppMeetingsRoute: typeof AppMeetingsRoute
@@ -399,7 +379,6 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppDraftsRoute: AppDraftsRoute,
-  AppFollowUpsRoute: AppFollowUpsRoute,
   AppHomeRoute: AppHomeRoute,
   AppInboxRoute: AppInboxRoute,
   AppMeetingsRoute: AppMeetingsRoute,
