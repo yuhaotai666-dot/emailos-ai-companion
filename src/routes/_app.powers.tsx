@@ -269,12 +269,84 @@ function RoutineTile({
   );
 }
 
+interface Skill {
+  id: string;
+  name: string;
+  description: string;
+  letter: string;
+  tone: string;
+  author: string;
+  installs?: string;
+}
+
+const communitySkills: Skill[] = [
+  {
+    id: "linkedin-outreach",
+    name: "LinkedIn Outreach Writer",
+    description: "Drafts personalized LinkedIn messages based on a profile and your goal.",
+    letter: "L",
+    tone: "bg-blue-100 text-blue-700",
+    author: "@marcus",
+    installs: "2.3k",
+  },
+  {
+    id: "invoice-parser",
+    name: "Invoice Parser",
+    description: "Extracts line items, totals, and due dates from invoice PDFs into a table.",
+    letter: "I",
+    tone: "bg-emerald-100 text-emerald-700",
+    author: "@finance-tools",
+    installs: "1.1k",
+  },
+  {
+    id: "resume-screener",
+    name: "Resume Screener",
+    description: "Scores candidate resumes against a job description with reasoning.",
+    letter: "R",
+    tone: "bg-purple-100 text-purple-700",
+    author: "@hrops",
+    installs: "890",
+  },
+  {
+    id: "meeting-notes",
+    name: "Meeting Notes → Action Items",
+    description: "Turns raw meeting transcripts into structured action items with owners.",
+    letter: "M",
+    tone: "bg-amber-100 text-amber-700",
+    author: "@ivy",
+    installs: "4.7k",
+  },
+  {
+    id: "competitor-scan",
+    name: "Competitor Scan",
+    description: "Given a company name, produces a one-page competitive brief from public sources.",
+    letter: "C",
+    tone: "bg-rose-100 text-rose-700",
+    author: "@growth",
+    installs: "612",
+  },
+  {
+    id: "sql-helper",
+    name: "SQL Helper",
+    description: "Translates plain-English questions into SQL against your schema.",
+    letter: "S",
+    tone: "bg-sky-100 text-sky-700",
+    author: "@data",
+    installs: "3.2k",
+  },
+];
+
 function SkillsTab() {
+  const [query, setQuery] = useState("");
+  const filtered = communitySkills.filter((s) =>
+    query ? s.name.toLowerCase().includes(query.toLowerCase()) : true,
+  );
+
   return (
     <div>
       <SectionHeader
         title="Skills"
-        subtitle="Upload reusable skills that your assistant can use. Skills are directories with a SKILL.md file containing instructions."
+        subtitle="Skills are subagents Ivy spawns for specific tasks. Describe what you need — Ivy generates a subagent for you. Publish it to share with the community."
         action={
           <div className="flex items-center gap-2">
             <button className="rounded-full border border-border bg-card px-4 py-2 text-sm flex items-center gap-1.5 hover:bg-sidebar-accent transition">
@@ -283,21 +355,65 @@ function SkillsTab() {
             </button>
             <button className="rounded-full bg-foreground text-background px-4 py-2 text-sm flex items-center gap-1.5 hover:opacity-90 transition">
               <Plus className="h-3.5 w-3.5" />
-              Create
+              Create skill
             </button>
           </div>
         }
       />
 
       <h2 className="text-sm font-medium text-foreground mb-4">My skills</h2>
-      <div className="rounded-2xl border border-dashed border-border bg-cream/40 px-6 py-16 text-center">
+      <div className="rounded-2xl border border-dashed border-border bg-cream/40 px-6 py-12 text-center mb-10">
         <p className="text-sm text-muted-foreground">
-          No skills yet. Ask your assistant to create one, or upload a SKILL.md or .zip archive.
+          No skills yet. Describe a task to Ivy and she'll spin up a subagent — publish it when it's ready.
         </p>
+      </div>
+
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h2 className="text-sm font-medium text-foreground">Community skills</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">Published by other Ivy users. Install to use them yourself.</p>
+        </div>
+        <div className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 w-64">
+          <Search className="h-3.5 w-3.5 text-muted-foreground" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search skills"
+            className="flex-1 bg-transparent text-xs outline-none placeholder:text-muted-foreground"
+          />
+        </div>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {filtered.map((s) => (
+          <div
+            key={s.id}
+            className="rounded-2xl border border-border bg-card p-4 flex flex-col shadow-[var(--shadow-soft)]"
+          >
+            <div className="flex items-start justify-between mb-2">
+              <span
+                className={
+                  "h-10 w-10 rounded-xl flex items-center justify-center font-medium " +
+                  s.tone
+                }
+              >
+                {s.letter}
+              </span>
+              <span className="text-[11px] text-muted-foreground">{s.installs} installs</span>
+            </div>
+            <h3 className="font-medium text-foreground text-sm">{s.name}</h3>
+            <p className="text-[11px] text-muted-foreground mt-0.5">by {s.author}</p>
+            <p className="mt-2 text-xs text-muted-foreground flex-1">{s.description}</p>
+            <button className="mt-3 w-full rounded-lg border border-border text-sm py-1.5 hover:bg-sidebar-accent transition">
+              Install
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );
 }
+
 
 interface Integration {
   id: string;
