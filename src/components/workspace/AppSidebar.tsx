@@ -16,7 +16,7 @@ import { mockAssistant, mockUser } from "@/lib/mock-data";
 
 const items = [
   { title: "Home", url: "/home", icon: Home },
-  { title: "Inbox", url: "/inbox", icon: Inbox },
+  { title: "Email", url: "/inbox", icon: Inbox },
   { title: "Calendar", url: "/calendar", icon: CalendarDays },
   { title: "To-do", url: "/todo", icon: ListChecks },
   { title: "Meetings", url: "/meetings", icon: Calendar },
