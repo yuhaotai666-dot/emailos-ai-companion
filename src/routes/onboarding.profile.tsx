@@ -37,7 +37,7 @@ function ProfileStep() {
     <OnboardingCard
       step={5}
       title="Here's what we know about you."
-      subtitle="A quick summary EmailOS built from your inbox and calendar. You can edit this later."
+      subtitle="A quick summary Ivy built from your inbox and calendar. You can edit this later."
       primaryLabel="Finish setup"
       onPrimary={() => {
         finish();

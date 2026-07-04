@@ -16,7 +16,7 @@ import {
 export const Route = createFileRoute("/_app/home")({
   head: () => ({
     meta: [
-      { title: "Home — EmailOS AI" },
+      { title: "Home — Ivy" },
       { name: "description", content: "Your daily briefing, tasks, and what needs your attention." },
     ],
   }),
@@ -51,7 +51,7 @@ function HomePage() {
           {/* Task input */}
           <div className="mt-8 rounded-3xl border border-border bg-card shadow-[var(--shadow-card)] p-5">
             <div className="min-h-[76px]">
-              <p className="text-sm text-muted-foreground">Give EmailOS a task</p>
+              <p className="text-sm text-muted-foreground">Give Ivy a task</p>
             </div>
             <div className="mt-2 flex items-center gap-1.5">
               <IconButton icon={Plus} label="Add" />
@@ -88,7 +88,7 @@ function HomePage() {
                 <h2 className="text-sm font-medium text-foreground">Tasks</h2>
                 <span className="text-xs text-muted-foreground">Today</span>
               </div>
-              <EmptyState title="Nothing here yet" hint="Give EmailOS a task above and it'll show up here." />
+              <EmptyState title="Nothing here yet" hint="Give Ivy a task above and it'll show up here." />
             </section>
 
             <section>

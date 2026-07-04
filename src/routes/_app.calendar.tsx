@@ -9,9 +9,9 @@ import { mockMeetings } from "@/lib/mock-data";
 export const Route = createFileRoute("/_app/calendar")({
   head: () => ({
     meta: [
-      { title: "Calendar — EmailOS AI" },
+      { title: "Calendar — Ivy" },
       { name: "description", content: "Your meetings and email-driven events in one calm view." },
-      { property: "og:title", content: "Calendar — EmailOS AI" },
+      { property: "og:title", content: "Calendar — Ivy" },
       { property: "og:description", content: "Your meetings and email-driven events in one calm view." },
     ],
   }),

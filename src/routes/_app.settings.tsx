@@ -16,8 +16,8 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_app/settings")({
   head: () => ({
     meta: [
-      { title: "Settings — EmailOS AI" },
-      { name: "description", content: "Preferences, safety, and integrations for EmailOS AI." },
+      { title: "Settings — Ivy" },
+      { name: "description", content: "Preferences, safety, and integrations for Ivy." },
     ],
   }),
   component: SettingsPage,

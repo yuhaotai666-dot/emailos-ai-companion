@@ -8,12 +8,12 @@ import { useTodoStore } from "@/lib/todo-store";
 export const Route = createFileRoute("/_app/todo")({
   head: () => ({
     meta: [
-      { title: "To-do — EmailOS AI" },
+      { title: "To-do — Ivy" },
       {
         name: "description",
         content: "Personal action items your meeting assistant pulled out for you.",
       },
-      { property: "og:title", content: "To-do — EmailOS AI" },
+      { property: "og:title", content: "To-do — Ivy" },
       {
         property: "og:description",
         content: "Personal action items your meeting assistant pulled out for you.",
@@ -86,7 +86,7 @@ function TodoPage() {
             <Sparkles className="h-3.5 w-3.5" />
           </span>
           <p className="text-xs text-foreground/85 leading-relaxed">
-            These items were surfaced by EmailOS from your meeting follow-ups.
+            These items were surfaced by Ivy from your meeting follow-ups.
             Complete them here or open the original meeting for context.
           </p>
         </div>
@@ -185,7 +185,7 @@ function TodoPage() {
           <div className="rounded-2xl border border-dashed border-border bg-card/50 p-10 text-center">
             <p className="text-sm text-muted-foreground">
               {myTodos.length === 0
-                ? "No action items yet. EmailOS will add them here after your next meeting."
+                ? "No action items yet. Ivy will add them here after your next meeting."
                 : "Nothing matches this filter."}
             </p>
           </div>

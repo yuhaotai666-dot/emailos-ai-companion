@@ -9,7 +9,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_app/people")({
   head: () => ({
     meta: [
-      { title: "People — EmailOS AI" },
+      { title: "People — Ivy" },
       {
         name: "description",
         content:
@@ -25,7 +25,7 @@ function PeoplePage() {
     <div className="mx-auto max-w-6xl px-6 lg:px-10 py-10">
       <PageHeader
         title="People"
-        subtitle="Working profiles EmailOS builds from your conversations."
+        subtitle="Working profiles Ivy builds from your conversations."
       />
 
       <div className="rounded-2xl border border-border bg-cream/70 px-4 py-3 text-sm text-foreground/85 flex items-start gap-3 mb-4">
@@ -33,7 +33,7 @@ function PeoplePage() {
           <Sparkles className="h-3 w-3 text-accent" />
         </span>
         <p className="flex-1">
-          EmailOS builds working profiles from your conversations. You can edit or delete
+          Ivy builds working profiles from your conversations. You can edit or delete
           anything it remembers.
         </p>
       </div>

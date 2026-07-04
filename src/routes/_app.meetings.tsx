@@ -9,7 +9,7 @@ import { CalendarClock, Users, Sparkles, Check, Pencil, RefreshCw } from "lucide
 export const Route = createFileRoute("/_app/meetings")({
   head: () => ({
     meta: [
-      { title: "Meetings — EmailOS AI" },
+      { title: "Meetings — Ivy" },
       {
         name: "description",
         content:

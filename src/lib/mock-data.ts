@@ -35,7 +35,7 @@ export const mockUser = {
 };
 
 export const mockAssistant = {
-  name: "EmailOS",
+  name: "Ivy",
   email: "assistant@emailos.ai",
 };
 
@@ -635,7 +635,7 @@ export const mockPeople: Person[] = [
     whoTheyAre:
       "Maya makes long-form YouTube essays on creator economy tooling. Her audience is smaller than Krishna's but skews founder / operator, which converts well.",
     relationshipContext:
-      "First paid collaboration with EmailOS. Currently in review stage — she wants feedback before publishing.",
+      "First paid collaboration with Ivy. Currently in review stage — she wants feedback before publishing.",
     stage: "Review stage — unlisted cut pending approval",
     active: "active",
     lastContacted: "1h ago",

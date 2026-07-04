@@ -23,12 +23,12 @@ export const Route = createFileRoute("/_app/people/$personId")({
     const p = mockPeople.find((x) => x.id === params.personId);
     return {
       meta: [
-        { title: p ? `${p.name} — People — EmailOS AI` : "Person — EmailOS AI" },
+        { title: p ? `${p.name} — People — Ivy` : "Person — Ivy" },
         {
           name: "description",
           content: p
             ? p.aiDescription
-            : "AI-generated relationship profile in EmailOS.",
+            : "AI-generated relationship profile in Ivy.",
         },
       ],
     };
@@ -47,7 +47,7 @@ function PersonNotFound() {
     <div className="mx-auto max-w-2xl px-6 py-16 text-center">
       <h1 className="font-serif text-3xl text-foreground">Person not found</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        EmailOS doesn't have a profile for this person yet.
+        Ivy doesn't have a profile for this person yet.
       </p>
       <Link
         to="/people"
@@ -266,7 +266,7 @@ function PersonDetail() {
           <Section title="Uncertainties">
             {p.uncertainties.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                EmailOS is confident in what it knows.
+                Ivy is confident in what it knows.
               </p>
             ) : (
               <ul className="grid gap-1.5">

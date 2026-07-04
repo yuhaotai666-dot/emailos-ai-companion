@@ -24,7 +24,7 @@ function ConnectStep() {
     <OnboardingCard
       step={2}
       title="Supercharge your assistant."
-      subtitle="Connect your email and work apps so EmailOS AI can help you more. Everything is optional."
+      subtitle="Connect your email and work apps so Ivy can help you more. Everything is optional."
       primaryLabel="Continue"
       onPrimary={() => nav({ to: "/onboarding/assistant" })}
       onSkip={() => nav({ to: "/onboarding/assistant" })}

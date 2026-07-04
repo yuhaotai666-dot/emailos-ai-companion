@@ -10,8 +10,8 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_app/memory")({
   head: () => ({
     meta: [
-      { title: "Memory — EmailOS AI" },
-      { name: "description", content: "EmailOS learns how you work, but you stay in control." },
+      { title: "Memory — Ivy" },
+      { name: "description", content: "Ivy learns how you work, but you stay in control." },
     ],
   }),
   component: MemoryPage,
@@ -24,9 +24,9 @@ function MemoryPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-6 lg:px-10 py-10">
-      <PageHeader title="Memory" subtitle="EmailOS learns how you work, but you stay in control." />
+      <PageHeader title="Memory" subtitle="Ivy learns how you work, but you stay in control." />
       <p className="mb-6 text-xs text-muted-foreground">
-        You can delete or edit anything EmailOS remembers.
+        You can delete or edit anything Ivy remembers.
       </p>
 
       <div className="grid gap-4">
