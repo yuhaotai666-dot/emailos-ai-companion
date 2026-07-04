@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { mockPeople, type Person } from "@/lib/mock-data";
+import { type Person } from "@/lib/mock-data";
+import { fetchPerson } from "@/lib/api/queries";
 import {
   RelationshipBadge,
   StatusBadge,
@@ -19,8 +20,8 @@ import {
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/people/$personId")({
-  head: ({ params }) => {
-    const p = mockPeople.find((x) => x.id === params.personId);
+  head: ({ loaderData }) => {
+    const p = (loaderData as { person?: Person } | undefined)?.person;
     return {
       meta: [
         { title: p ? `${p.name} — People — Ivy` : "Person — Ivy" },
@@ -33,8 +34,8 @@ export const Route = createFileRoute("/_app/people/$personId")({
       ],
     };
   },
-  loader: ({ params }) => {
-    const person = mockPeople.find((p) => p.id === params.personId);
+  loader: async ({ params }) => {
+    const person = await fetchPerson(params.personId);
     if (!person) throw notFound();
     return { person };
   },

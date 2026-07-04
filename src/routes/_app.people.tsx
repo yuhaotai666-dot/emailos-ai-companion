@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { mockPeople } from "@/lib/mock-data";
+import { usePeople } from "@/lib/api/queries";
 import { PageHeader } from "@/components/workspace/Common";
 import { RelationshipBadge, StatusBadge } from "@/components/workspace/Badges";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ export const Route = createFileRoute("/_app/people")({
 });
 
 function PeoplePage() {
+  const { data: people = [] } = usePeople();
   return (
     <div className="mx-auto max-w-6xl px-6 lg:px-10 py-10">
       <PageHeader
@@ -65,7 +66,7 @@ function PeoplePage() {
       </div>
 
       <div className="grid gap-3">
-        {mockPeople.map((p) => (
+        {people.map((p) => (
           <Link
             key={p.id}
             to="/people/$personId"

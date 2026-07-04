@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PageHeader } from "@/components/workspace/Common";
 import { Button } from "@/components/ui/button";
-import { mockMeetings } from "@/lib/mock-data";
+import { useCalendarMeetings } from "@/lib/api/queries";
 
 export const Route = createFileRoute("/_app/calendar")({
   head: () => ({
@@ -56,19 +56,17 @@ function startOfMonth(d: Date) {
   return new Date(d.getFullYear(), d.getMonth(), 1);
 }
 
-const MEETING_OFFSETS = [0, 1, 3]; // aligns m1..m3 to today, tomorrow, Thu-ish
-const MEETING_TIMES = ["2:00 PM", "11:30 AM", "4:00 PM"];
-
 function useEvents(): CalendarEvent[] {
+  const { data: meetings = [] } = useCalendarMeetings();
   return useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const events: CalendarEvent[] = mockMeetings.map((m, i) => ({
+    const events: CalendarEvent[] = meetings.map((m) => ({
       id: m.id,
       title: m.title,
-      date: addDays(today, MEETING_OFFSETS[i] ?? i),
-      time: MEETING_TIMES[i] ?? "10:00 AM",
+      date: m.date,
+      time: m.time,
       source: "meeting",
       meetingId: m.id,
     }));
@@ -83,7 +81,7 @@ function useEvents(): CalendarEvent[] {
 
     extras.forEach((e, i) => events.push({ ...e, id: `x${i}` }));
     return events;
-  }, []);
+  }, [meetings]);
 }
 
 function CalendarPage() {

@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Sparkles, Check } from "lucide-react";
 import { PageHeader } from "@/components/workspace/Common";
-import { mockMeetings } from "@/lib/mock-data";
+import { useEmailTodos, useMeetings } from "@/lib/api/queries";
 import { useTodoStore } from "@/lib/todo-store";
 
 export const Route = createFileRoute("/_app/todo")({
@@ -41,9 +41,12 @@ function TodoPage() {
   const [filter, setFilter] = useState<Filter>("open");
   const [meetingId, setMeetingId] = useState<string | "all">("all");
 
+  const { data: meetings = [] } = useMeetings();
+  const { data: emailTodos = [] } = useEmailTodos();
+
   const myTodos = useMemo<DerivedTodo[]>(
-    () =>
-      mockMeetings.flatMap((m) =>
+    () => [
+      ...meetings.flatMap((m) =>
         m.followUp.todos
           .filter((t) => t.owner.toLowerCase().includes("theo"))
           .map((t, i) => ({
@@ -54,7 +57,16 @@ function TodoPage() {
             due: t.due,
           })),
       ),
-    [],
+      // Suggested actions from emails that still need a reply.
+      ...emailTodos.map((t) => ({
+        id: t.id,
+        meetingId: "inbox",
+        meetingTitle: t.context,
+        task: t.text,
+        due: t.deadline,
+      })),
+    ],
+    [meetings, emailTodos],
   );
 
   const filtered = myTodos.filter((t) => {
@@ -69,8 +81,9 @@ function TodoPage() {
   const doneCount = myTodos.length - openCount;
 
   const meetingChips = [
-    { id: "all" as const, title: "All meetings" },
-    ...mockMeetings.map((m) => ({ id: m.id, title: m.title })),
+    { id: "all" as const, title: "All sources" },
+    ...meetings.map((m) => ({ id: m.id, title: m.title })),
+    ...(emailTodos.length ? [{ id: "inbox", title: "From emails" }] : []),
   ];
 
   return (
@@ -170,7 +183,7 @@ function TodoPage() {
                     </span>
                   )}
                   <button
-                    onClick={() => navigate({ to: "/meetings" })}
+                    onClick={() => navigate({ to: t.meetingId === "inbox" ? "/inbox" : "/meetings" })}
                     className="text-[10px] text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
                   >
                     From: {t.meetingTitle}

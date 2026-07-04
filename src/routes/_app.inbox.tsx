@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { mockEmails } from "@/lib/mock-data";
+import { RefreshCw } from "lucide-react";
+import { useEmails, useRunTriage } from "@/lib/api/queries";
 import { PageHeader } from "@/components/workspace/Common";
 import { PriorityBadge, CategoryBadge } from "@/components/workspace/Badges";
 import { Button } from "@/components/ui/button";
@@ -26,7 +27,10 @@ function InboxPage() {
   const emailEventMap = useEventsStore((s) => s.emailEventMap);
   const events = useEventsStore((s) => s.events);
 
-  const priorityFiltered = mockEmails;
+  const { data: emails = [], isLoading } = useEmails();
+  const runTriage = useRunTriage();
+
+  const priorityFiltered = emails;
 
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
@@ -48,14 +52,26 @@ function InboxPage() {
         subtitle="Ivy separates what matters from what can wait."
       />
 
-      <div className="mb-6">
-        <EventFilterBar
-          value={eventFilter}
-          onChange={setEventFilter}
-          counts={counts}
-          totalCount={priorityFiltered.length}
-          onManage={() => setManageOpen(true)}
-        />
+      <div className="mb-6 flex items-center gap-3 flex-wrap">
+        <div className="flex-1 min-w-0">
+          <EventFilterBar
+            value={eventFilter}
+            onChange={setEventFilter}
+            counts={counts}
+            totalCount={priorityFiltered.length}
+            onManage={() => setManageOpen(true)}
+          />
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="rounded-full h-8 text-xs bg-background gap-1.5 shrink-0"
+          disabled={runTriage.isPending}
+          onClick={() => runTriage.mutate()}
+        >
+          <RefreshCw className={"h-3 w-3" + (runTriage.isPending ? " animate-spin" : "")} />
+          {runTriage.isPending ? "Running…" : "Run triage"}
+        </Button>
       </div>
 
 
@@ -119,7 +135,7 @@ function InboxPage() {
         {filtered.length === 0 && (
           <div className="rounded-2xl border border-dashed border-border bg-card/50 p-10 text-center">
             <p className="text-sm text-muted-foreground">
-              No emails match this filter combination.
+              {isLoading ? "Loading your inbox…" : "No emails match this filter combination."}
             </p>
           </div>
         )}

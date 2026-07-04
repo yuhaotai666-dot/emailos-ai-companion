@@ -1,13 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import {
-  taskExamples,
-  homeNeedToKnow,
-  homeSuggestions,
-  mockUser,
-  mockMeetings,
-} from "@/lib/mock-data";
+import { taskExamples } from "@/lib/mock-data";
+import { useBrief, useMeetings, useUserName } from "@/lib/api/queries";
 import { EmptyState } from "@/components/workspace/Common";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
@@ -58,9 +53,13 @@ function HomePage() {
 
   const [input, setInput] = useState("");
 
+  const { data: userName = "there" } = useUserName();
+  const { data: brief } = useBrief();
+  const { data: meetings = [] } = useMeetings();
+
   const todayMeetings = useMemo(
-    () => mockMeetings.filter((m) => /^today/i.test(m.time)),
-    [],
+    () => meetings.filter((m) => /^today/i.test(m.time)),
+    [meetings],
   );
 
   function submit() {
@@ -93,7 +92,10 @@ function HomePage() {
           </div>
 
           <h1 className="mt-3 font-serif text-4xl sm:text-5xl text-foreground leading-tight">
-            {greeting}, {mockUser.name}. You have 7 emails that need your attention.
+            {greeting}, {userName}.{" "}
+            {brief
+              ? `You have ${brief.needsAttention} email${brief.needsAttention === 1 ? "" : "s"} that need your attention.`
+              : "Loading your briefing…"}
           </h1>
 
           {/* Task input */}
@@ -194,7 +196,7 @@ function HomePage() {
               <h3 className="text-sm font-medium text-foreground">Need to know</h3>
             </div>
             <ul className="grid gap-3">
-              {homeNeedToKnow.map((n) => (
+              {(brief?.needToKnow ?? []).map((n) => (
                 <li key={n.id} className="border-b border-border last:border-0 pb-3 last:pb-0">
                   <p className="text-sm text-foreground leading-snug">{n.text}</p>
                   <div className="mt-1.5 flex items-center justify-between text-[11px] text-muted-foreground">
@@ -211,7 +213,7 @@ function HomePage() {
           <div className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
             <h3 className="text-sm font-medium text-foreground mb-3">Suggestions</h3>
             <ul className="grid gap-2">
-              {homeSuggestions.map((s) => (
+              {(brief?.suggestions ?? []).map((s) => (
                 <li key={s}>
                   <button
                     onClick={() => setInput(s)}

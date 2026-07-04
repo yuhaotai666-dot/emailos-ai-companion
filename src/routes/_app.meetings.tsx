@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { mockMeetings } from "@/lib/mock-data";
+import { useMeetings } from "@/lib/api/queries";
 import { PageHeader } from "@/components/workspace/Common";
 import { Button } from "@/components/ui/button";
 import { CalendarClock, Users, Sparkles, Check, Pencil, RefreshCw } from "lucide-react";
@@ -24,6 +24,7 @@ type SendState = Record<string, "draft" | "sent">;
 
 function MeetingsPage() {
   const [sent, setSent] = useState<SendState>({});
+  const { data: meetings = [] } = useMeetings();
 
   const send = (id: string, count: number) => {
     setSent((s) => ({ ...s, [id]: "sent" }));
@@ -39,7 +40,7 @@ function MeetingsPage() {
 
       <h2 className="text-sm font-medium text-foreground mb-3">Upcoming meetings</h2>
       <div className="grid gap-4">
-        {mockMeetings.map((m) => {
+        {meetings.map((m) => {
           const status = sent[m.id] ?? "draft";
           const isSent = status === "sent";
           return (

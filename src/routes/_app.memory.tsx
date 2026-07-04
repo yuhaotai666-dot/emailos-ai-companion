@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { mockMemory } from "@/lib/mock-data";
+import { useEffect, useState } from "react";
+import { useMemoryProfile } from "@/lib/api/queries";
 import { PageHeader } from "@/components/workspace/Common";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,9 +18,15 @@ export const Route = createFileRoute("/_app/memory")({
 });
 
 function MemoryPage() {
-  const [memory, setMemory] = useState<Record<string, string[]>>(mockMemory);
+  const { data: loadedMemory } = useMemoryProfile();
+  const [memory, setMemory] = useState<Record<string, string[]>>({});
   const [editing, setEditing] = useState<{ section: string; idx: number } | null>(null);
   const [draftText, setDraftText] = useState("");
+
+  // Local edits layer on top of what the backend knows; refresh replaces both.
+  useEffect(() => {
+    if (loadedMemory) setMemory(loadedMemory);
+  }, [loadedMemory]);
 
   return (
     <div className="mx-auto max-w-4xl px-6 lg:px-10 py-10">
