@@ -10,16 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OnboardingIndexRouteImport } from './routes/onboarding.index'
 import { Route as OnboardingRoutinesRouteImport } from './routes/onboarding.routines'
 import { Route as OnboardingProfileRouteImport } from './routes/onboarding.profile'
 import { Route as OnboardingConnectRouteImport } from './routes/onboarding.connect'
 import { Route as OnboardingAssistantRouteImport } from './routes/onboarding.assistant'
+import { Route as AppInboxRouteImport } from './routes/_app.inbox'
+import { Route as AppHomeRouteImport } from './routes/_app.home'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -52,10 +59,22 @@ const OnboardingAssistantRoute = OnboardingAssistantRouteImport.update({
   path: '/assistant',
   getParentRoute: () => OnboardingRoute,
 } as any)
+const AppInboxRoute = AppInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHomeRoute = AppHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRouteWithChildren
+  '/home': typeof AppHomeRoute
+  '/inbox': typeof AppInboxRoute
   '/onboarding/assistant': typeof OnboardingAssistantRoute
   '/onboarding/connect': typeof OnboardingConnectRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
@@ -64,6 +83,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/home': typeof AppHomeRoute
+  '/inbox': typeof AppInboxRoute
   '/onboarding/assistant': typeof OnboardingAssistantRoute
   '/onboarding/connect': typeof OnboardingConnectRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
@@ -73,7 +94,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
   '/onboarding': typeof OnboardingRouteWithChildren
+  '/_app/home': typeof AppHomeRoute
+  '/_app/inbox': typeof AppInboxRoute
   '/onboarding/assistant': typeof OnboardingAssistantRoute
   '/onboarding/connect': typeof OnboardingConnectRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
@@ -85,6 +109,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/onboarding'
+    | '/home'
+    | '/inbox'
     | '/onboarding/assistant'
     | '/onboarding/connect'
     | '/onboarding/profile'
@@ -93,6 +119,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/home'
+    | '/inbox'
     | '/onboarding/assistant'
     | '/onboarding/connect'
     | '/onboarding/profile'
@@ -101,7 +129,10 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_app'
     | '/onboarding'
+    | '/_app/home'
+    | '/_app/inbox'
     | '/onboarding/assistant'
     | '/onboarding/connect'
     | '/onboarding/profile'
@@ -111,6 +142,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
   OnboardingRoute: typeof OnboardingRouteWithChildren
 }
 
@@ -121,6 +153,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -165,8 +204,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingAssistantRouteImport
       parentRoute: typeof OnboardingRoute
     }
+    '/_app/inbox': {
+      id: '/_app/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof AppInboxRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/home': {
+      id: '/_app/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AppHomeRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
+
+interface AppRouteChildren {
+  AppHomeRoute: typeof AppHomeRoute
+  AppInboxRoute: typeof AppInboxRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppHomeRoute: AppHomeRoute,
+  AppInboxRoute: AppInboxRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface OnboardingRouteChildren {
   OnboardingAssistantRoute: typeof OnboardingAssistantRoute
@@ -190,6 +255,7 @@ const OnboardingRouteWithChildren = OnboardingRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
   OnboardingRoute: OnboardingRouteWithChildren,
 }
 export const routeTree = rootRouteImport
