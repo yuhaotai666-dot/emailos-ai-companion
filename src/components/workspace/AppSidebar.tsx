@@ -2,8 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   Home,
   Inbox,
-  MessageSquareReply,
-  PenLine,
+  CalendarDays,
   Calendar,
   Users,
   Brain,
@@ -17,8 +16,7 @@ import { mockAssistant, mockUser } from "@/lib/mock-data";
 const items = [
   { title: "Home", url: "/home", icon: Home },
   { title: "Inbox", url: "/inbox", icon: Inbox },
-  { title: "Need Reply", url: "/need-reply", icon: MessageSquareReply },
-  { title: "Drafts", url: "/drafts", icon: PenLine },
+  { title: "Calendar", url: "/calendar", icon: CalendarDays },
   { title: "Meetings", url: "/meetings", icon: Calendar },
   { title: "People", url: "/people", icon: Users },
   { title: "Memory", url: "/memory", icon: Brain },
