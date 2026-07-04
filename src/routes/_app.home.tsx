@@ -2,7 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { taskExamples } from "@/lib/mock-data";
-import { useBrief, useIvyChat, useMeetings, useUserName, type ChatEvent } from "@/lib/api/queries";
+import {
+  useBrief,
+  useIvyChat,
+  useMeetings,
+  useSpecialists,
+  useUserName,
+  type ChatEvent,
+} from "@/lib/api/queries";
 import { EmptyState } from "@/components/workspace/Common";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
@@ -62,6 +69,7 @@ function HomePage() {
   const { data: userName = "there" } = useUserName();
   const { data: brief } = useBrief();
   const { data: meetings = [] } = useMeetings();
+  const { data: specialists = [] } = useSpecialists();
   const ivy = useIvyChat();
 
   const [thread, setThread] = useState<ChatTurn[]>([]);
@@ -271,6 +279,30 @@ function HomePage() {
               ))}
             </ul>
           </div>
+
+          {specialists.length > 0 && (
+            <div className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
+              <h3 className="text-sm font-medium text-foreground mb-3">Ivy's team</h3>
+              <ul className="grid gap-2.5">
+                {specialists.map((s) => (
+                  <li key={s.id} className="border-b border-border last:border-0 pb-2.5 last:pb-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-xs font-medium text-foreground truncate">{s.name}</p>
+                      <span className="shrink-0 rounded-full border border-border bg-cream px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                        {s.runs}x
+                      </span>
+                    </div>
+                    <p className="mt-0.5 text-[11px] text-muted-foreground leading-snug line-clamp-2">
+                      {s.description}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-3 text-[10px] text-muted-foreground">
+                Sub-agents Ivy created for your tasks — they grow as you delegate more.
+              </p>
+            </div>
+          )}
 
           <div className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]">
             <h3 className="text-sm font-medium text-foreground mb-3">Suggestions</h3>

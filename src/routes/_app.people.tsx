@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { usePeople, useSpecialists } from "@/lib/api/queries";
+import { usePeople } from "@/lib/api/queries";
 import { PageHeader } from "@/components/workspace/Common";
 import { RelationshipBadge, StatusBadge } from "@/components/workspace/Badges";
 import { Button } from "@/components/ui/button";
-import { Plus, Download, Contact, ArrowRight, Sparkles, Bot } from "lucide-react";
+import { Plus, Download, Contact, ArrowRight, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/people")({
@@ -22,7 +22,6 @@ export const Route = createFileRoute("/_app/people")({
 
 function PeoplePage() {
   const { data: people = [] } = usePeople();
-  const { data: specialists = [] } = useSpecialists();
   return (
     <div className="mx-auto max-w-6xl px-6 lg:px-10 py-10">
       <PageHeader
@@ -65,47 +64,6 @@ function PeoplePage() {
           <Contact className="h-3.5 w-3.5" /> Enable Google Contacts
         </Button>
       </div>
-
-      {specialists.length > 0 && (
-        <section className="mb-8">
-          <div className="flex items-center gap-2 mb-3">
-            <Bot className="h-4 w-4 text-accent" />
-            <h2 className="text-sm font-medium text-foreground">Ivy's specialist team</h2>
-            <span className="text-xs text-muted-foreground">
-              — sub-agents Ivy created and reuses for your tasks
-            </span>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-3">
-            {specialists.map((s) => (
-              <div
-                key={s.id}
-                className="rounded-2xl border border-border bg-cream/50 p-4 shadow-[var(--shadow-soft)]"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-background border border-border">
-                    <Bot className="h-3.5 w-3.5 text-foreground" />
-                  </span>
-                  <p className="text-sm font-medium text-foreground">{s.name}</p>
-                  <span className="ml-auto rounded-full border border-border bg-background px-2 py-0.5 text-[10px] text-muted-foreground">
-                    used {s.runs}x
-                  </span>
-                </div>
-                <p className="mt-2 text-xs text-foreground/85 leading-relaxed">{s.description}</p>
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {s.tools.map((t) => (
-                    <span
-                      key={t}
-                      className="rounded-full border border-border/70 bg-background px-1.5 py-0.5 text-[10px] text-muted-foreground"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
 
       <div className="grid gap-3">
         {people.map((p) => (
