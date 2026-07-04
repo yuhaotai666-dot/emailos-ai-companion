@@ -18,6 +18,7 @@ import { Route as OnboardingProfileRouteImport } from './routes/onboarding.profi
 import { Route as OnboardingConnectRouteImport } from './routes/onboarding.connect'
 import { Route as OnboardingAssistantRouteImport } from './routes/onboarding.assistant'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
+import { Route as AppPeopleRouteImport } from './routes/_app.people'
 import { Route as AppNeedReplyRouteImport } from './routes/_app.need-reply'
 import { Route as AppMemoryRouteImport } from './routes/_app.memory'
 import { Route as AppMeetingsRouteImport } from './routes/_app.meetings'
@@ -25,6 +26,7 @@ import { Route as AppInboxRouteImport } from './routes/_app.inbox'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppFollowUpsRouteImport } from './routes/_app.follow-ups'
 import { Route as AppDraftsRouteImport } from './routes/_app.drafts'
+import { Route as AppPeoplePersonIdRouteImport } from './routes/_app.people.$personId'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -70,6 +72,11 @@ const AppSettingsRoute = AppSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPeopleRoute = AppPeopleRouteImport.update({
+  id: '/people',
+  path: '/people',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppNeedReplyRoute = AppNeedReplyRouteImport.update({
   id: '/need-reply',
   path: '/need-reply',
@@ -105,6 +112,11 @@ const AppDraftsRoute = AppDraftsRouteImport.update({
   path: '/drafts',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPeoplePersonIdRoute = AppPeoplePersonIdRouteImport.update({
+  id: '/$personId',
+  path: '/$personId',
+  getParentRoute: () => AppPeopleRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -116,12 +128,14 @@ export interface FileRoutesByFullPath {
   '/meetings': typeof AppMeetingsRoute
   '/memory': typeof AppMemoryRoute
   '/need-reply': typeof AppNeedReplyRoute
+  '/people': typeof AppPeopleRouteWithChildren
   '/settings': typeof AppSettingsRoute
   '/onboarding/assistant': typeof OnboardingAssistantRoute
   '/onboarding/connect': typeof OnboardingConnectRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
   '/onboarding/routines': typeof OnboardingRoutinesRoute
   '/onboarding/': typeof OnboardingIndexRoute
+  '/people/$personId': typeof AppPeoplePersonIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -132,12 +146,14 @@ export interface FileRoutesByTo {
   '/meetings': typeof AppMeetingsRoute
   '/memory': typeof AppMemoryRoute
   '/need-reply': typeof AppNeedReplyRoute
+  '/people': typeof AppPeopleRouteWithChildren
   '/settings': typeof AppSettingsRoute
   '/onboarding/assistant': typeof OnboardingAssistantRoute
   '/onboarding/connect': typeof OnboardingConnectRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
   '/onboarding/routines': typeof OnboardingRoutinesRoute
   '/onboarding': typeof OnboardingIndexRoute
+  '/people/$personId': typeof AppPeoplePersonIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -151,12 +167,14 @@ export interface FileRoutesById {
   '/_app/meetings': typeof AppMeetingsRoute
   '/_app/memory': typeof AppMemoryRoute
   '/_app/need-reply': typeof AppNeedReplyRoute
+  '/_app/people': typeof AppPeopleRouteWithChildren
   '/_app/settings': typeof AppSettingsRoute
   '/onboarding/assistant': typeof OnboardingAssistantRoute
   '/onboarding/connect': typeof OnboardingConnectRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
   '/onboarding/routines': typeof OnboardingRoutinesRoute
   '/onboarding/': typeof OnboardingIndexRoute
+  '/_app/people/$personId': typeof AppPeoplePersonIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -170,12 +188,14 @@ export interface FileRouteTypes {
     | '/meetings'
     | '/memory'
     | '/need-reply'
+    | '/people'
     | '/settings'
     | '/onboarding/assistant'
     | '/onboarding/connect'
     | '/onboarding/profile'
     | '/onboarding/routines'
     | '/onboarding/'
+    | '/people/$personId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -186,12 +206,14 @@ export interface FileRouteTypes {
     | '/meetings'
     | '/memory'
     | '/need-reply'
+    | '/people'
     | '/settings'
     | '/onboarding/assistant'
     | '/onboarding/connect'
     | '/onboarding/profile'
     | '/onboarding/routines'
     | '/onboarding'
+    | '/people/$personId'
   id:
     | '__root__'
     | '/'
@@ -204,12 +226,14 @@ export interface FileRouteTypes {
     | '/_app/meetings'
     | '/_app/memory'
     | '/_app/need-reply'
+    | '/_app/people'
     | '/_app/settings'
     | '/onboarding/assistant'
     | '/onboarding/connect'
     | '/onboarding/profile'
     | '/onboarding/routines'
     | '/onboarding/'
+    | '/_app/people/$personId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -283,6 +307,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/people': {
+      id: '/_app/people'
+      path: '/people'
+      fullPath: '/people'
+      preLoaderRoute: typeof AppPeopleRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/need-reply': {
       id: '/_app/need-reply'
       path: '/need-reply'
@@ -332,8 +363,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDraftsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/people/$personId': {
+      id: '/_app/people/$personId'
+      path: '/$personId'
+      fullPath: '/people/$personId'
+      preLoaderRoute: typeof AppPeoplePersonIdRouteImport
+      parentRoute: typeof AppPeopleRoute
+    }
   }
 }
+
+interface AppPeopleRouteChildren {
+  AppPeoplePersonIdRoute: typeof AppPeoplePersonIdRoute
+}
+
+const AppPeopleRouteChildren: AppPeopleRouteChildren = {
+  AppPeoplePersonIdRoute: AppPeoplePersonIdRoute,
+}
+
+const AppPeopleRouteWithChildren = AppPeopleRoute._addFileChildren(
+  AppPeopleRouteChildren,
+)
 
 interface AppRouteChildren {
   AppDraftsRoute: typeof AppDraftsRoute
@@ -343,6 +393,7 @@ interface AppRouteChildren {
   AppMeetingsRoute: typeof AppMeetingsRoute
   AppMemoryRoute: typeof AppMemoryRoute
   AppNeedReplyRoute: typeof AppNeedReplyRoute
+  AppPeopleRoute: typeof AppPeopleRouteWithChildren
   AppSettingsRoute: typeof AppSettingsRoute
 }
 
@@ -354,6 +405,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppMeetingsRoute: AppMeetingsRoute,
   AppMemoryRoute: AppMemoryRoute,
   AppNeedReplyRoute: AppNeedReplyRoute,
+  AppPeopleRoute: AppPeopleRouteWithChildren,
   AppSettingsRoute: AppSettingsRoute,
 }
 

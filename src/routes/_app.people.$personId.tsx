@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { mockPeople } from "@/lib/mock-data";
+import { mockPeople, type Person } from "@/lib/mock-data";
 import {
   RelationshipBadge,
   StatusBadge,
@@ -87,7 +87,7 @@ const sourceIcons = {
 } as const;
 
 function PersonDetail() {
-  const { person: p } = Route.useLoaderData();
+  const { person: p } = Route.useLoaderData() as { person: Person };
 
   return (
     <div className="mx-auto max-w-6xl px-6 lg:px-10 py-10">
