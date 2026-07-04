@@ -194,7 +194,7 @@ function RoutinesTab() {
     <div>
       <SectionHeader
         title="Routines"
-        subtitle="Routines let your assistant handle recurring work with the right triggers, context, and actions."
+        subtitle="Workflows that run on a schedule. Define what Ivy should do — every day, every week, or on a trigger."
         action={
           <div className="flex items-center gap-2">
             <button className="rounded-full border border-border bg-card px-4 py-2 text-sm hover:bg-sidebar-accent transition">
