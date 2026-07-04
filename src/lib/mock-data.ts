@@ -245,7 +245,32 @@ export const mockFollowUps = [
   },
 ];
 
-export const mockMeetings = [
+export interface MeetingFollowUpTodo {
+  owner: string;
+  task: string;
+  due?: string;
+}
+
+export interface MeetingFollowUp {
+  generatedAt: string;
+  recipients: string[];
+  subject: string;
+  summary: string;
+  todos: MeetingFollowUpTodo[];
+}
+
+export interface MockMeeting {
+  id: string;
+  title: string;
+  time: string;
+  attendees: string[];
+  prep: string;
+  questions: string[];
+  actionItems: string[];
+  followUp: MeetingFollowUp;
+}
+
+export const mockMeetings: MockMeeting[] = [
   {
     id: "m1",
     title: "Creator sync — Maya Chen",
@@ -257,6 +282,19 @@ export const mockMeetings = [
       "Are we ok promoting the referral code in the description?",
     ],
     actionItems: ["Send revised script notes", "Confirm publish date"],
+    followUp: {
+      generatedAt: "2 min after meeting",
+      recipients: ["maya@youtube-partner.tv", "theo@superintern.ai"],
+      subject: "Recap & next steps — Creator sync",
+      summary:
+        "We walked through the unlisted cut and aligned on tightening the SuperIntern intro to 15 seconds. Maya will re-edit timestamps 1:14 and 3:02, and we agreed to include the THEO25 referral code in the pinned comment and description. Publish window is confirmed for Monday morning.",
+      todos: [
+        { owner: "Maya", task: "Re-cut intro to 15s and revise 1:14 / 3:02", due: "Sun" },
+        { owner: "Maya", task: "Add THEO25 referral code to description + pinned comment", due: "Sun" },
+        { owner: "Theo", task: "Send final approval on revised cut", due: "Sun EOD" },
+        { owner: "Theo", task: "Confirm payment queued for Thursday run" },
+      ],
+    },
   },
   {
     id: "m2",
@@ -266,6 +304,18 @@ export const mockMeetings = [
     prep: "Northlight is exploring a co-marketing angle for Q1. Bring the partner deck.",
     questions: ["What audience overlap are you seeing?", "Are you open to a shared referral program?"],
     actionItems: ["Share partner deck", "Send follow-up with next steps"],
+    followUp: {
+      generatedAt: "3 min after meeting",
+      recipients: ["rina@northlightco.com", "theo@superintern.ai"],
+      subject: "Recap & next steps — Northlight × SuperIntern intro",
+      summary:
+        "Rina outlined Northlight's Q1 co-marketing focus on indie founder audiences, which overlaps ~40% with SuperIntern's creator base. We discussed a shared referral program with split attribution and agreed to pilot a joint newsletter placement before signing anything broader.",
+      todos: [
+        { owner: "Theo", task: "Send partner deck + audience overlap notes", due: "Tomorrow" },
+        { owner: "Rina", task: "Share Northlight's Q1 co-marketing calendar", due: "This week" },
+        { owner: "Theo", task: "Draft pilot terms for joint newsletter placement", due: "Next Mon" },
+      ],
+    },
   },
   {
     id: "m3",
@@ -275,6 +325,19 @@ export const mockMeetings = [
     prep: "Watch the 90s positioning cut. Prepare 3 pieces of feedback.",
     questions: ["Is the pain clear in the first 10 seconds?", "Does the CTA feel natural?"],
     actionItems: ["Send timestamped feedback", "Approve final cut"],
+    followUp: {
+      generatedAt: "1 min after meeting",
+      recipients: ["ana@superintern.ai", "theo@superintern.ai", "product@superintern.ai"],
+      subject: "Recap & next steps — Positioning video review",
+      summary:
+        "Team reviewed the 90-second positioning cut. Consensus: the pain point lands well in the first 10 seconds, but the CTA feels rushed. Ana will tighten the closing 8 seconds and Product will validate the on-screen product shot at 0:42 before Friday's sign-off.",
+      todos: [
+        { owner: "Ana", task: "Re-cut final 8 seconds with a slower CTA", due: "Thu EOD" },
+        { owner: "Product", task: "Confirm product UI shot at 0:42 is current", due: "Fri AM" },
+        { owner: "Theo", task: "Send timestamped feedback doc to Ana", due: "Thu" },
+        { owner: "Theo", task: "Approve final cut once revisions are in", due: "Fri" },
+      ],
+    },
   },
 ];
 
