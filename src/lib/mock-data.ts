@@ -419,3 +419,426 @@ export const taskExamples = [
   "Prepare a follow-up email for Krishna",
   "Show me what I need to reply to",
 ];
+
+export type RelationshipType =
+  | "Creator Partner"
+  | "Influencer"
+  | "Internal Team"
+  | "Finance"
+  | "Product Access"
+  | "Sales Lead"
+  | "Customer"
+  | "Personal";
+
+export type PersonStatus =
+  | "Needs reply"
+  | "Waiting for them"
+  | "Waiting for payment"
+  | "Video in review"
+  | "Access issue"
+  | "Active collaboration"
+  | "Paused";
+
+export type Confidence = "high" | "medium" | "low";
+export type SourceType = "email" | "meeting" | "manual note";
+
+export interface PersonThread {
+  subject: string;
+  snippet: string;
+  needsReplyFrom: "you" | "them";
+  suggestedNext: string;
+}
+
+export interface PersonClaim {
+  text: string;
+  sourceType: SourceType;
+  observedDate: string;
+  confidence: Confidence;
+}
+
+export interface Person {
+  id: string;
+  name: string;
+  email: string;
+  company: string;
+  role: string;
+  channel: string;
+  website?: string;
+  socials?: { twitter?: string; youtube?: string; linkedin?: string };
+  relationship: RelationshipType;
+  status: PersonStatus;
+  aiDescription: string;
+  whoTheyAre: string;
+  relationshipContext: string;
+  stage: string;
+  active: "active" | "paused" | "needs follow-up";
+  lastContacted: string;
+  openThreads: number;
+  threads: PersonThread[];
+  suggestedNextAction: string;
+  communicationStyle: { tone: string[]; notes: string };
+  importantContext: { label: string; value: string }[];
+  uncertainties: string[];
+  claims: PersonClaim[];
+}
+
+export const mockPeople: Person[] = [
+  {
+    id: "krishna-patel",
+    name: "Krishna Patel",
+    email: "krishna@creatorlab.co",
+    company: "Creator Lab",
+    role: "Founder & creator",
+    channel: "Email · YouTube",
+    website: "creatorlab.co",
+    socials: { youtube: "@creatorlab", twitter: "@krishpatel" },
+    relationship: "Creator Partner",
+    status: "Waiting for payment",
+    aiDescription:
+      "Long-time creator partner running the sponsored SuperIntern segment. Currently waiting on a $500 sponsorship payment you committed to last week.",
+    whoTheyAre:
+      "Krishna runs Creator Lab, a mid-size YouTube channel focused on productivity tools for indie founders. He typically produces one sponsored segment per month and prefers direct, timeline-driven conversations.",
+    relationshipContext:
+      "You brought Krishna into the SuperIntern creator program in Q3. He's on his second paid segment with you.",
+    stage: "Active sponsorship — awaiting payment clearance",
+    active: "needs follow-up",
+    lastContacted: "3 days ago",
+    openThreads: 2,
+    threads: [
+      {
+        subject: "Quick check — when will payment arrive?",
+        snippet: "Following up on the $500 sponsorship payment agreed last week.",
+        needsReplyFrom: "you",
+        suggestedNext: "Confirm Thursday's payment run and share confirmation once cleared.",
+      },
+      {
+        subject: "Segment analytics — first week",
+        snippet: "Krishna shared 7-day performance numbers for the last segment.",
+        needsReplyFrom: "you",
+        suggestedNext: "Acknowledge numbers and propose a follow-up segment.",
+      },
+    ],
+    suggestedNextAction: "Reply to Krishna with Thursday's payment ETA and confirmation link.",
+    communicationStyle: {
+      tone: ["Direct", "Warm", "Concise"],
+      notes: "Prefers short replies with clear dates. Skip small talk. Always confirm timelines in writing.",
+    },
+    importantContext: [
+      { label: "Agreed rate", value: "$500 flat / segment" },
+      { label: "Payment status", value: "Queued for Thursday's run" },
+      { label: "Referral code", value: "KRISHNA25" },
+      { label: "Tracking link", value: "superintern.ai/r/krishna" },
+      { label: "Deadlines", value: "Reply before Friday" },
+      { label: "Risks", value: "Don't promise same-day payment — finance owns the run." },
+    ],
+    uncertainties: [
+      "Whether Krishna wants to book a third segment this quarter.",
+      "Whether the current rate holds for a longer-form video.",
+    ],
+    claims: [
+      {
+        text: "$500 flat rate agreed for the current segment.",
+        sourceType: "email",
+        observedDate: "6 days ago",
+        confidence: "high",
+      },
+      {
+        text: "Prefers payment confirmation before publishing.",
+        sourceType: "email",
+        observedDate: "3 days ago",
+        confidence: "high",
+      },
+      {
+        text: "Open to a Q1 follow-up segment.",
+        sourceType: "meeting",
+        observedDate: "2 weeks ago",
+        confidence: "medium",
+      },
+    ],
+  },
+  {
+    id: "maya-chen",
+    name: "Maya Chen",
+    email: "maya@youtube-partner.tv",
+    company: "Independent",
+    role: "YouTube creator",
+    channel: "Email · YouTube",
+    website: "youtube.com/@mayachen",
+    socials: { youtube: "@mayachen", twitter: "@mayacreates" },
+    relationship: "Influencer",
+    status: "Video in review",
+    aiDescription:
+      "Independent YouTube creator who just sent an unlisted cut of the SuperIntern integration segment. Publishing Monday.",
+    whoTheyAre:
+      "Maya makes long-form YouTube essays on creator economy tooling. Her audience is smaller than Krishna's but skews founder / operator, which converts well.",
+    relationshipContext:
+      "First paid collaboration with EmailOS. Currently in review stage — she wants feedback before publishing.",
+    stage: "Review stage — unlisted cut pending approval",
+    active: "active",
+    lastContacted: "1h ago",
+    openThreads: 1,
+    threads: [
+      {
+        subject: "Unlisted video ready for your review",
+        snippet: "Unlisted YouTube link with SuperIntern integration segment.",
+        needsReplyFrom: "you",
+        suggestedNext: "Watch the segment and send timestamped notes at 1:14 and 3:02.",
+      },
+    ],
+    suggestedNextAction: "Review the unlisted YouTube video and send timestamped notes before Monday.",
+    communicationStyle: {
+      tone: ["Friendly", "Professional"],
+      notes: "Appreciates specific timestamps and rationale. Avoid vague feedback.",
+    },
+    importantContext: [
+      { label: "Agreed rate", value: "$750 flat" },
+      { label: "Video status", value: "Unlisted cut delivered" },
+      { label: "Deadlines", value: "Publish Monday" },
+      { label: "Referral code", value: "MAYA25" },
+      { label: "Risks", value: "Don't request structural rewrites — publish window is tight." },
+    ],
+    uncertainties: ["Whether Maya wants a second segment this year."],
+    claims: [
+      {
+        text: "Unlisted cut sent 1h ago.",
+        sourceType: "email",
+        observedDate: "1h ago",
+        confidence: "high",
+      },
+      {
+        text: "Publish scheduled for Monday.",
+        sourceType: "email",
+        observedDate: "1h ago",
+        confidence: "high",
+      },
+    ],
+  },
+  {
+    id: "pj-okoye",
+    name: "PJ Okoye",
+    email: "pj@ridgepartners.co",
+    company: "Ridge Partners",
+    role: "Head of creator launches",
+    channel: "Email",
+    website: "ridgepartners.co",
+    relationship: "Creator Partner",
+    status: "Needs reply",
+    aiDescription:
+      "Runs launch content for enterprise creators. Waiting on tracking link and referral code before Wednesday's launch post.",
+    whoTheyAre:
+      "PJ coordinates launches for a small stable of high-reach creators. Direct communicator, tight on operational detail.",
+    relationshipContext:
+      "Introduced by Krishna. First launch together — currently in launch prep.",
+    stage: "Launch prep — awaiting assets from you",
+    active: "needs follow-up",
+    lastContacted: "2h ago",
+    openThreads: 1,
+    threads: [
+      {
+        subject: "Tracking link + referral code for launch",
+        snippet: "Needs tracking link and referral code for Wednesday's launch post.",
+        needsReplyFrom: "you",
+        suggestedNext: "Generate tracking link and send referral code THEO25.",
+      },
+    ],
+    suggestedNextAction: "Send the tracking link and referral code so PJ can finalize Wednesday's launch post.",
+    communicationStyle: {
+      tone: ["Direct", "Operational"],
+      notes: "One-line replies work. Include links and codes in the same message.",
+    },
+    importantContext: [
+      { label: "Referral code", value: "THEO25" },
+      { label: "Tracking link", value: "superintern.ai/r/pj" },
+      { label: "Deadlines", value: "Wednesday launch" },
+      { label: "Risks", value: "Do not promise co-branded landing page yet." },
+    ],
+    uncertainties: ["Whether PJ's other creators are candidates for the program."],
+    claims: [
+      {
+        text: "Launch post scheduled Wednesday.",
+        sourceType: "email",
+        observedDate: "2h ago",
+        confidence: "high",
+      },
+    ],
+  },
+  {
+    id: "max-herrera",
+    name: "Max Herrera",
+    email: "max@stackednorth.co",
+    company: "Stacked North",
+    role: "Operator, trial user",
+    channel: "Email",
+    relationship: "Product Access",
+    status: "Access issue",
+    aiDescription:
+      "Signed up for SuperIntern but blocked on the Gmail OAuth screen. Sent a screenshot 8h ago.",
+    whoTheyAre:
+      "Runs ops at a small holding company. Patient and technical. Currently evaluating SuperIntern for his team.",
+    relationshipContext:
+      "Trial user brought in from a partner referral. Blocked before completing first setup.",
+    stage: "Trial — blocked on access",
+    active: "needs follow-up",
+    lastContacted: "8h ago",
+    openThreads: 1,
+    threads: [
+      {
+        subject: "Can't log into SuperIntern",
+        snippet: "Stuck on the Gmail OAuth screen — screenshot attached.",
+        needsReplyFrom: "you",
+        suggestedNext: "Escalate to support and confirm access is restored within 24h.",
+      },
+    ],
+    suggestedNextAction: "Escalate the Gmail OAuth issue to support and reply with an ETA.",
+    communicationStyle: {
+      tone: ["Patient", "Technical"],
+      notes: "Include steps and expected timing. Screenshots help.",
+    },
+    importantContext: [
+      { label: "Product access", value: "Blocked — Gmail OAuth" },
+      { label: "Deadlines", value: "Reply within 24h" },
+      { label: "Risks", value: "Trial may lapse if unresolved this week." },
+    ],
+    uncertainties: ["Team size Max plans to bring on if trial converts."],
+    claims: [
+      {
+        text: "OAuth screen fails on his account.",
+        sourceType: "email",
+        observedDate: "8h ago",
+        confidence: "high",
+      },
+    ],
+  },
+  {
+    id: "ana-rivera",
+    name: "Ana Rivera",
+    email: "ana@superintern.ai",
+    company: "SuperIntern",
+    role: "Marketing lead",
+    channel: "Email · Slack",
+    relationship: "Internal Team",
+    status: "Active collaboration",
+    aiDescription:
+      "Owns the SuperIntern product story. Currently waiting on your feedback on the 90-second positioning cut.",
+    whoTheyAre:
+      "Ana leads marketing at SuperIntern and drives the positioning narrative. Collaborative and detail-oriented.",
+    relationshipContext:
+      "Cross-functional partner. You review her positioning drafts before team-wide share.",
+    stage: "Positioning review",
+    active: "active",
+    lastContacted: "Today",
+    openThreads: 1,
+    threads: [
+      {
+        subject: "Feedback on new positioning video?",
+        snippet: "Needs your review on the 90-second cut before the team meeting.",
+        needsReplyFrom: "you",
+        suggestedNext: "Watch and send 3 pieces of feedback before tomorrow's review.",
+      },
+    ],
+    suggestedNextAction: "Send timestamped feedback on the 90s positioning cut before the team review.",
+    communicationStyle: {
+      tone: ["Friendly", "Collaborative"],
+      notes: "Frame feedback around audience clarity, not personal taste.",
+    },
+    importantContext: [
+      { label: "Video status", value: "90s cut pending your review" },
+      { label: "Deadlines", value: "Team review tomorrow" },
+    ],
+    uncertainties: ["Whether the current CTA will change before publish."],
+    claims: [
+      {
+        text: "Team-wide review scheduled tomorrow.",
+        sourceType: "meeting",
+        observedDate: "Today",
+        confidence: "high",
+      },
+    ],
+  },
+  {
+    id: "rina-alvarez",
+    name: "Rina Alvarez",
+    email: "rina@northlightco.com",
+    company: "Northlight",
+    role: "Partnerships",
+    channel: "Email",
+    website: "northlightco.com",
+    relationship: "Sales Lead",
+    status: "Waiting for them",
+    aiDescription:
+      "Exploring a co-marketing angle for Q1. Proposed 30 minutes next week — awaiting her preferred slot.",
+    whoTheyAre:
+      "Runs partnerships at Northlight. Professional, warm, and interested in shared referral programs.",
+    relationshipContext:
+      "Cold intro that warmed into a real conversation. Currently pre-intro-call stage.",
+    stage: "Intro call scheduled",
+    active: "active",
+    lastContacted: "1d ago",
+    openThreads: 1,
+    threads: [
+      {
+        subject: "30 min next week?",
+        snippet: "Proposed Tuesday or Wednesday afternoon for a co-marketing discussion.",
+        needsReplyFrom: "them",
+        suggestedNext: "Wait for her preferred slot; prepare partner deck.",
+      },
+    ],
+    suggestedNextAction: "Prepare the partner deck ahead of Rina's intro call next week.",
+    communicationStyle: {
+      tone: ["Professional", "Warm"],
+      notes: "Longer replies are welcome. Concrete numbers help.",
+    },
+    importantContext: [
+      { label: "Deadlines", value: "Intro call next week" },
+      { label: "Risks", value: "Don't commit to a shared referral program yet." },
+    ],
+    uncertainties: ["Their actual audience overlap with SuperIntern."],
+    claims: [
+      {
+        text: "Northlight is exploring co-marketing for Q1.",
+        sourceType: "email",
+        observedDate: "1d ago",
+        confidence: "medium",
+      },
+    ],
+  },
+  {
+    id: "finance-superintern",
+    name: "Finance @ SuperIntern",
+    email: "finance@superintern.ai",
+    company: "SuperIntern",
+    role: "Finance operations",
+    channel: "Email",
+    relationship: "Finance",
+    status: "Active collaboration",
+    aiDescription:
+      "Owns creator payment runs. Confirmed Thursday's run includes Krishna, Jade, and two others.",
+    whoTheyAre:
+      "Internal finance function. Concise and formal. Handles all creator payouts.",
+    relationshipContext:
+      "Always CC on payment threads with creators. No action required unless a run is delayed.",
+    stage: "Ongoing operations",
+    active: "active",
+    lastContacted: "9h ago",
+    openThreads: 0,
+    threads: [],
+    suggestedNextAction: "No action — reference Thursday's run when replying to Krishna and Jade.",
+    communicationStyle: {
+      tone: ["Concise", "Formal"],
+      notes: "Keep replies factual. Include creator names and amounts.",
+    },
+    importantContext: [
+      { label: "Payment status", value: "Thursday run includes Krishna, Jade + 2 others" },
+      { label: "Risks", value: "Don't commit to same-day payments." },
+    ],
+    uncertainties: [],
+    claims: [
+      {
+        text: "Thursday payment run is queued and confirmed.",
+        sourceType: "email",
+        observedDate: "9h ago",
+        confidence: "high",
+      },
+    ],
+  },
+];

@@ -1,125 +1,78 @@
 
-# EmailOS AI — Build Plan
+## People page — AI relationship memory
 
-A premium, calm, personal AI email assistant UI. Mock data only. No backend, no real integrations. Design leans warm-minimal (Town/Superhuman feel): off-white background, cream sections, subtle borders, rounded cards, soft shadows, serif headlines for onboarding, sans-serif body.
+Rename `/contacts` to `/people` and rebuild it as a lightweight AI relationship memory system. Add a detail route per person with a full AI-generated profile. Sidebar link updated. Mock data only.
 
-## Design system (src/styles.css)
+### Routes
 
-Redefine tokens to warm palette:
-- `--background`: warm off-white (~oklch(0.985 0.005 85))
-- `--card`: cream (~oklch(0.975 0.01 80))
-- `--foreground`: near-black warm grey
-- `--muted`: soft beige
-- `--border`: subtle warm grey
-- `--primary`: warm near-black (buttons)
-- `--accent`: muted blue/purple, used sparingly
-- Soft shadow token, larger radius default (`--radius: 0.875rem`)
+- `src/routes/_app.people.tsx` — list view (replaces `_app.contacts.tsx`, which is deleted).
+- `src/routes/_app.people.$personId.tsx` — detail view.
 
-Fonts (loaded via `<link>` in `__root.tsx` head, then referenced in `@theme`):
-- Headings/onboarding titles: **Instrument Serif** (serif elegance)
-- Body/UI: **Inter** (clean sans)
+Update sidebar entry in `src/components/workspace/AppSidebar.tsx` from "Contacts" → "People" pointing to `/people`. Each route has its own `head()` title/description.
 
-Update `__root.tsx` head metadata to real EmailOS AI title/description/OG.
+### Mock data (extend `src/lib/mock-data.ts`)
 
-## Routes (TanStack file-based)
+Extend `mockContacts` into a richer `mockPeople` array (keep old export as alias to avoid breaking anything). Each person has:
 
-```
-src/routes/
-  __root.tsx              (updated head, fonts, OG)
-  index.tsx               → redirects to /onboarding or /home (mock: land on /onboarding first-time via localStorage flag, else /home)
-  onboarding.tsx          (layout with centered card, progress dots, back arrow, Outlet)
-  onboarding.index.tsx    → step 1 Welcome
-  onboarding.connect.tsx  → step 2 Connect accounts
-  onboarding.assistant.tsx→ step 3 Create assistant
-  onboarding.routines.tsx → step 4 Routines
-  onboarding.profile.tsx  → step 5 Profile summary → "Finish setup" → /home
-  _app.tsx                (workspace layout: left sidebar + main + right panel slot)
-  _app.home.tsx
-  _app.inbox.tsx
-  _app.need-reply.tsx
-  _app.drafts.tsx
-  _app.follow-ups.tsx
-  _app.meetings.tsx
-  _app.contacts.tsx
-  _app.memory.tsx
-  _app.settings.tsx
-```
+- `id`, `name`, `email`, `company`, `role`, `channel` (website/YouTube/Slack), `socials` (twitter/youtube/linkedin optional)
+- `relationship`: `Creator Partner | Influencer | Internal Team | Finance | Product Access | Sales Lead | Customer | Personal`
+- `status`: `Needs reply | Waiting for them | Waiting for payment | Video in review | Access issue | Active collaboration | Paused`
+- `aiDescription` — 1–2 sentence AI summary
+- `whoTheyAre` — longer AI paragraph
+- `relationshipContext` — how user knows them, stage, active/paused
+- `lastContacted`, `openThreads: number`
+- `threads[]` — `{ subject, snippet, needsReplyFrom: 'you'|'them', suggestedNext }`
+- `suggestedNextAction` — single clear recommendation string
+- `communicationStyle` — `{ tone: string[], notes: string }`
+- `importantContext[]` — key/value list (Agreed rate, Payment status, Video status, Product access, Referral code, Tracking link, Deadlines, Risks)
+- `uncertainties[]` — strings
+- `claims[]` — `{ text, sourceType: 'email'|'meeting'|'manual note', observedDate, confidence: 'high'|'medium'|'low' }`
 
-Each route sets its own `head()` with distinct title/description.
+Seed ~6 people tied to existing mock threads: Krishna Patel (Creator Partner, Waiting for payment), Maya Chen (Influencer, Video in review), PJ Okoye (Creator Partner, Needs reply), Max Herrera (Product Access, Access issue), Ana Rivera (Internal Team, Active collaboration), Rina Alvarez (Sales Lead, Waiting for them), Finance @ SuperIntern (Finance, Active collaboration).
 
-## Components
+### List page (`/people`)
 
-Reusable, in `src/components/`:
+Top of page:
+- `PageHeader` title "People" with subtitle.
+- Notice card (reuses `TrustBanner`-style pattern): "EmailOS builds working profiles from your conversations. You can edit or delete anything it remembers."
+- Action row: `Create contact`, `Import contacts`, `Enable Google Contacts` (buttons wired to `sonner` toasts — no real logic).
 
-**Onboarding**
-- `OnboardingCard` — centered rounded cream card, back arrow, progress dots, footer with primary + skip CTA
-- `StepDots`
-- `ValuePoint` (icon + line)
-- `ConnectionCard` (app icon, name, description, Connect/Connected pill button)
-- `RoutineCard` (title, description, toggles list, warning slot)
-- `PersonaTile` (avatar tile, selectable)
-- `PersonalityChip` (selectable chip)
+Below: card list (responsive: table-like row on desktop, stacked card on mobile). Each row shows avatar initials, name, email, company/channel, `RelationshipBadge`, `StatusBadge`, short AI description, last contacted, open thread count pill, and an "Open" action button linking to `/people/$personId`.
 
-**Workspace**
-- `AppSidebar` — logo, search, New, nav items (Home, Inbox, Need Reply, Drafts, Follow-ups, Meetings, Contacts, Memory, Settings), assistant card + user card at bottom (uses shadcn Sidebar with `collapsible="icon"`)
-- `TaskInput` — large central input card with action icons (Add, People, Schedule, Shield, Voice, Task type)
-- `RightPanel` with `NeedToKnowCard` + `SuggestionsCard`
-- `EmailCard` (sender, subject, AI summary, category badge, priority badge, suggested action, reason, actions)
-- `PriorityBadge`, `CategoryBadge` (muted, no bright colors)
-- `DraftCard` + `DraftEditorModal` (shadcn Dialog: left context, right editable textarea, tone selector, Regenerate/Save/Create Gmail Draft)
-- `FollowUpCard`
-- `MeetingCard`
-- `ContactCard`
-- `MemoryItem` (editable inline)
-- `SettingsToggleRow`, `SettingsSection`
-- `EmptyState`, `TrustBanner` ("AI drafts. You approve.")
+New small components (co-located, no new files unless needed):
+- `RelationshipBadge` and `StatusBadge` — extend `src/components/workspace/Badges.tsx` with color-coded variants per type/status.
 
-## Mock data (`src/lib/mock-data.ts`)
+### Detail page (`/people/$personId`)
 
-- `mockEmails` — 10 realistic emails (creator payment, YouTube unlisted review, tracking link, Gmail support, $300 flat fee, internal video feedback, product access, finance confirmation, meeting scheduling, partnership follow-up)
-- `mockDrafts`, `mockFollowUps`, `mockMeetings`, `mockContacts`, `mockMemory`
-- `mockUser` = Theo, Head of Growth / Partnerships @ SuperIntern
-- `mockAssistant` = { name: "EmailOS", email: "assistant@emailos.ai" }
+Two-column layout on desktop, single column on mobile. Left column: identity + suggested next action pinned near top. Right column: sections below.
 
-State: lightweight `zustand` store (or React context) for onboarding selections + assistant name/personality. Persist to `localStorage` so onboarding completion routes to `/home`.
+Sections (each as a rounded card matching existing `bg-card` / `shadow-[var(--shadow-soft)]` style):
 
-## Page details
+1. **Contact** — email, company, role, channel/website, social handles.
+2. **Who they are** — AI summary paragraph.
+3. **Your relationship** — how user knows them, stage, active/paused indicator.
+4. **Recent / Open threads** — list of threads with "Needs reply from you/them" tag and suggested next step per thread.
+5. **Suggested next action** — prominent callout card with a primary action button (toast).
+6. **Communication style** — tone chips + notes.
+7. **Important context** — two-column key/value grid.
+8. **Uncertainties** — muted bulleted list with a subtle "low-confidence" treatment.
+9. **Claims / Sources** — list where each item shows text, source type icon (Mail / Calendar / StickyNote), observed date, and a confidence pill (high/medium/low).
 
-**/onboarding steps** — each uses `OnboardingCard`. Progress dots reflect current step. Back arrow uses router history. Primary CTA advances to next route. Step 5 "Finish setup" sets `localStorage.emailos_onboarded = true` and navigates to `/home`.
+Header row: back link to `/people`, name, relationship + status badges, "Edit" and "Delete" buttons (toast placeholders — matches the notice card promise).
 
-**/home** — Date + View schedule link, serif greeting "Good afternoon, Theo. You have 7 emails that need your attention.", central `TaskInput` with 5 example prompts as ghost chips below, Tasks + Recents sections (empty state), right panel with Need to know (3 items) + Suggestions (5 items).
+If `personId` doesn't match, render `notFound()` with a `notFoundComponent`.
 
-**/inbox** — Header + subtext, Tabs (All / Need Reply / Important / FYI / Low Priority), list of `EmailCard`s filtered by tab.
+### Design notes
 
-**/need-reply** — Filter chips (High Priority, Creator Partnership, Payment, Meeting, Sales, Product Access), cards with why/suggested direction/draft preview/confidence, actions Review Draft / Create Gmail Draft / Ignore. Trust banner.
+- Reuse existing tokens (cream, border, muted). No new colors.
+- Badges use subtle tinted backgrounds — status colors differentiated but staying calm (e.g. amber tint for "Waiting for payment", blue for "Video in review", rose for "Access issue", green for "Active collaboration", neutral for "Paused").
+- Instrument Serif for section titles, Inter for body — matches current pages.
+- No new packages.
 
-**/drafts** — `DraftCard` list, persistent trust notice, click Edit opens `DraftEditorModal`.
+### Technical details
 
-**/follow-ups** — Follow-up cards with person, context, suggested message, due date, status, Draft follow-up button.
-
-**/meetings** — Sections: Upcoming, Prep, Summaries, Action items, Follow-up drafts.
-
-**/contacts** — Contact cards grid.
-
-**/memory** — Sections list with editable items, safety copy.
-
-**/settings** — 5 sections (Gmail Connection, AI Preferences, Email Categories, Safety Settings, Notifications) with toggles and selectors.
-
-## Technical notes
-
-- All views use mock data only. Buttons for Gmail/Calendar/Slack/WhatsApp/Telegram are placeholders that toast "Coming soon" via shadcn `sonner`.
-- Icons: Lucide.
-- No new packages needed beyond what's installed (shadcn already present). Add `zustand` only if state gets messy; otherwise React context is fine.
-- Responsive: desktop-first; sidebar collapses to icon on smaller widths; right panel stacks below main on narrow screens.
-- Accessibility: proper heading levels, focus states, aria labels on icon buttons.
-
-## Out of scope (explicitly)
-
-- Real Gmail/Calendar/Slack/WhatsApp/Telegram integration
-- Auth, backend, database (Lovable Cloud NOT enabled — mock only)
-- Real AI calls
-- Payments
-
-## Deliverable
-
-A polished, calm, elegant static UI that hangs together end-to-end with mock data, ready to wire to a real backend later.
+- Delete `src/routes/_app.contacts.tsx`; router auto-regenerates `routeTree.gen.ts`.
+- `createFileRoute("/_app/people")` and `createFileRoute("/_app/people/$personId")`.
+- Detail route uses `Route.useParams()` to look up person; missing person → `throw notFound()` with a `notFoundComponent` that offers a link back to `/people`.
+- All buttons (Create/Import/Enable Google Contacts/Edit/Delete/Next action) call `toast(...)` — no state mutation required.
+- Keep mock data pure — no server functions, no Lovable Cloud.

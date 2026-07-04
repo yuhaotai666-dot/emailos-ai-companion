@@ -22,7 +22,7 @@ const items = [
   { title: "Drafts", url: "/drafts", icon: PenLine },
   { title: "Follow-ups", url: "/follow-ups", icon: ListChecks },
   { title: "Meetings", url: "/meetings", icon: Calendar },
-  { title: "Contacts", url: "/contacts", icon: Users },
+  { title: "People", url: "/people", icon: Users },
   { title: "Memory", url: "/memory", icon: Brain },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
