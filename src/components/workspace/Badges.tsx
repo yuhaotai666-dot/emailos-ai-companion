@@ -1,4 +1,4 @@
-import type { Priority, Category } from "@/lib/mock-data";
+import type { Priority, Category, RelationshipType, PersonStatus, Confidence } from "@/lib/mock-data";
 
 const priorityStyles: Record<Priority, string> = {
   high: "bg-[oklch(0.94_0.05_25)] text-[oklch(0.4_0.12_25)] border-[oklch(0.88_0.06_25)]",
