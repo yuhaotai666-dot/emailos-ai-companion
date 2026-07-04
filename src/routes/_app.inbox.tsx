@@ -12,27 +12,21 @@ import { ManageEventsDialog } from "@/components/workspace/ManageEventsDialog";
 export const Route = createFileRoute("/_app/inbox")({
   head: () => ({
     meta: [
-      { title: "Inbox — EmailOS AI" },
-      { name: "description", content: "Your inbox, turned into a calm review queue." },
+      { title: "Email — EmailOS AI" },
+      { name: "description", content: "Your email, turned into a calm review queue." },
     ],
   }),
   component: InboxPage,
 });
 
-const tabs = ["All", "Need Reply", "Important", "FYI", "Low Priority"] as const;
-
 function InboxPage() {
-  const [tab, setTab] = useState<(typeof tabs)[number]>("All");
   const [eventFilter, setEventFilter] = useState<string | "all">("all");
   const [manageOpen, setManageOpen] = useState(false);
 
   const emailEventMap = useEventsStore((s) => s.emailEventMap);
   const events = useEventsStore((s) => s.events);
 
-  const priorityFiltered = useMemo(
-    () => mockEmails.filter((e) => (tab === "All" ? true : e.category === tab)),
-    [tab],
-  );
+  const priorityFiltered = mockEmails;
 
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
@@ -50,29 +44,9 @@ function InboxPage() {
   return (
     <div className="mx-auto max-w-5xl px-6 lg:px-10 py-10">
       <PageHeader
-        title="Your inbox, turned into a review queue."
+        title="Your email, turned into a review queue."
         subtitle="EmailOS separates what matters from what can wait."
       />
-
-      <div className="flex flex-wrap gap-1.5 mb-3">
-        {tabs.map((t) => {
-          const active = tab === t;
-          return (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              className={
-                "rounded-full border px-3.5 py-1.5 text-xs transition-colors " +
-                (active
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border bg-background text-foreground hover:bg-cream")
-              }
-            >
-              {t}
-            </button>
-          );
-        })}
-      </div>
 
       <div className="mb-6">
         <EventFilterBar
@@ -83,6 +57,7 @@ function InboxPage() {
           onManage={() => setManageOpen(true)}
         />
       </div>
+
 
       <div className="grid gap-3">
         {filtered.map((e) => {
