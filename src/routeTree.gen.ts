@@ -9,38 +9,243 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OnboardingIndexRouteImport } from './routes/onboarding.index'
+import { Route as OnboardingRoutinesRouteImport } from './routes/onboarding.routines'
+import { Route as OnboardingProfileRouteImport } from './routes/onboarding.profile'
+import { Route as OnboardingConnectRouteImport } from './routes/onboarding.connect'
+import { Route as OnboardingAssistantRouteImport } from './routes/onboarding.assistant'
+import { Route as AppSettingsRouteImport } from './routes/_app.settings'
+import { Route as AppNeedReplyRouteImport } from './routes/_app.need-reply'
+import { Route as AppMemoryRouteImport } from './routes/_app.memory'
+import { Route as AppMeetingsRouteImport } from './routes/_app.meetings'
+import { Route as AppInboxRouteImport } from './routes/_app.inbox'
+import { Route as AppHomeRouteImport } from './routes/_app.home'
+import { Route as AppFollowUpsRouteImport } from './routes/_app.follow-ups'
+import { Route as AppDraftsRouteImport } from './routes/_app.drafts'
+import { Route as AppContactsRouteImport } from './routes/_app.contacts'
 
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OnboardingIndexRoute = OnboardingIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => OnboardingRoute,
+} as any)
+const OnboardingRoutinesRoute = OnboardingRoutinesRouteImport.update({
+  id: '/routines',
+  path: '/routines',
+  getParentRoute: () => OnboardingRoute,
+} as any)
+const OnboardingProfileRoute = OnboardingProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => OnboardingRoute,
+} as any)
+const OnboardingConnectRoute = OnboardingConnectRouteImport.update({
+  id: '/connect',
+  path: '/connect',
+  getParentRoute: () => OnboardingRoute,
+} as any)
+const OnboardingAssistantRoute = OnboardingAssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
+  getParentRoute: () => OnboardingRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNeedReplyRoute = AppNeedReplyRouteImport.update({
+  id: '/need-reply',
+  path: '/need-reply',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMemoryRoute = AppMemoryRouteImport.update({
+  id: '/memory',
+  path: '/memory',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMeetingsRoute = AppMeetingsRouteImport.update({
+  id: '/meetings',
+  path: '/meetings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppInboxRoute = AppInboxRouteImport.update({
+  id: '/inbox',
+  path: '/inbox',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHomeRoute = AppHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppFollowUpsRoute = AppFollowUpsRouteImport.update({
+  id: '/follow-ups',
+  path: '/follow-ups',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDraftsRoute = AppDraftsRouteImport.update({
+  id: '/drafts',
+  path: '/drafts',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppContactsRoute = AppContactsRouteImport.update({
+  id: '/contacts',
+  path: '/contacts',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/onboarding': typeof OnboardingRouteWithChildren
+  '/contacts': typeof AppContactsRoute
+  '/drafts': typeof AppDraftsRoute
+  '/follow-ups': typeof AppFollowUpsRoute
+  '/home': typeof AppHomeRoute
+  '/inbox': typeof AppInboxRoute
+  '/meetings': typeof AppMeetingsRoute
+  '/memory': typeof AppMemoryRoute
+  '/need-reply': typeof AppNeedReplyRoute
+  '/settings': typeof AppSettingsRoute
+  '/onboarding/assistant': typeof OnboardingAssistantRoute
+  '/onboarding/connect': typeof OnboardingConnectRoute
+  '/onboarding/profile': typeof OnboardingProfileRoute
+  '/onboarding/routines': typeof OnboardingRoutinesRoute
+  '/onboarding/': typeof OnboardingIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/contacts': typeof AppContactsRoute
+  '/drafts': typeof AppDraftsRoute
+  '/follow-ups': typeof AppFollowUpsRoute
+  '/home': typeof AppHomeRoute
+  '/inbox': typeof AppInboxRoute
+  '/meetings': typeof AppMeetingsRoute
+  '/memory': typeof AppMemoryRoute
+  '/need-reply': typeof AppNeedReplyRoute
+  '/settings': typeof AppSettingsRoute
+  '/onboarding/assistant': typeof OnboardingAssistantRoute
+  '/onboarding/connect': typeof OnboardingConnectRoute
+  '/onboarding/profile': typeof OnboardingProfileRoute
+  '/onboarding/routines': typeof OnboardingRoutinesRoute
+  '/onboarding': typeof OnboardingIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/onboarding': typeof OnboardingRouteWithChildren
+  '/_app/contacts': typeof AppContactsRoute
+  '/_app/drafts': typeof AppDraftsRoute
+  '/_app/follow-ups': typeof AppFollowUpsRoute
+  '/_app/home': typeof AppHomeRoute
+  '/_app/inbox': typeof AppInboxRoute
+  '/_app/meetings': typeof AppMeetingsRoute
+  '/_app/memory': typeof AppMemoryRoute
+  '/_app/need-reply': typeof AppNeedReplyRoute
+  '/_app/settings': typeof AppSettingsRoute
+  '/onboarding/assistant': typeof OnboardingAssistantRoute
+  '/onboarding/connect': typeof OnboardingConnectRoute
+  '/onboarding/profile': typeof OnboardingProfileRoute
+  '/onboarding/routines': typeof OnboardingRoutinesRoute
+  '/onboarding/': typeof OnboardingIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/onboarding'
+    | '/contacts'
+    | '/drafts'
+    | '/follow-ups'
+    | '/home'
+    | '/inbox'
+    | '/meetings'
+    | '/memory'
+    | '/need-reply'
+    | '/settings'
+    | '/onboarding/assistant'
+    | '/onboarding/connect'
+    | '/onboarding/profile'
+    | '/onboarding/routines'
+    | '/onboarding/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/contacts'
+    | '/drafts'
+    | '/follow-ups'
+    | '/home'
+    | '/inbox'
+    | '/meetings'
+    | '/memory'
+    | '/need-reply'
+    | '/settings'
+    | '/onboarding/assistant'
+    | '/onboarding/connect'
+    | '/onboarding/profile'
+    | '/onboarding/routines'
+    | '/onboarding'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/onboarding'
+    | '/_app/contacts'
+    | '/_app/drafts'
+    | '/_app/follow-ups'
+    | '/_app/home'
+    | '/_app/inbox'
+    | '/_app/meetings'
+    | '/_app/memory'
+    | '/_app/need-reply'
+    | '/_app/settings'
+    | '/onboarding/assistant'
+    | '/onboarding/connect'
+    | '/onboarding/profile'
+    | '/onboarding/routines'
+    | '/onboarding/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  OnboardingRoute: typeof OnboardingRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +253,157 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/onboarding/': {
+      id: '/onboarding/'
+      path: '/'
+      fullPath: '/onboarding/'
+      preLoaderRoute: typeof OnboardingIndexRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
+    '/onboarding/routines': {
+      id: '/onboarding/routines'
+      path: '/routines'
+      fullPath: '/onboarding/routines'
+      preLoaderRoute: typeof OnboardingRoutinesRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
+    '/onboarding/profile': {
+      id: '/onboarding/profile'
+      path: '/profile'
+      fullPath: '/onboarding/profile'
+      preLoaderRoute: typeof OnboardingProfileRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
+    '/onboarding/connect': {
+      id: '/onboarding/connect'
+      path: '/connect'
+      fullPath: '/onboarding/connect'
+      preLoaderRoute: typeof OnboardingConnectRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
+    '/onboarding/assistant': {
+      id: '/onboarding/assistant'
+      path: '/assistant'
+      fullPath: '/onboarding/assistant'
+      preLoaderRoute: typeof OnboardingAssistantRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/need-reply': {
+      id: '/_app/need-reply'
+      path: '/need-reply'
+      fullPath: '/need-reply'
+      preLoaderRoute: typeof AppNeedReplyRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/memory': {
+      id: '/_app/memory'
+      path: '/memory'
+      fullPath: '/memory'
+      preLoaderRoute: typeof AppMemoryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/meetings': {
+      id: '/_app/meetings'
+      path: '/meetings'
+      fullPath: '/meetings'
+      preLoaderRoute: typeof AppMeetingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/inbox': {
+      id: '/_app/inbox'
+      path: '/inbox'
+      fullPath: '/inbox'
+      preLoaderRoute: typeof AppInboxRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/home': {
+      id: '/_app/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AppHomeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/follow-ups': {
+      id: '/_app/follow-ups'
+      path: '/follow-ups'
+      fullPath: '/follow-ups'
+      preLoaderRoute: typeof AppFollowUpsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/drafts': {
+      id: '/_app/drafts'
+      path: '/drafts'
+      fullPath: '/drafts'
+      preLoaderRoute: typeof AppDraftsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/contacts': {
+      id: '/_app/contacts'
+      path: '/contacts'
+      fullPath: '/contacts'
+      preLoaderRoute: typeof AppContactsRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppContactsRoute: typeof AppContactsRoute
+  AppDraftsRoute: typeof AppDraftsRoute
+  AppFollowUpsRoute: typeof AppFollowUpsRoute
+  AppHomeRoute: typeof AppHomeRoute
+  AppInboxRoute: typeof AppInboxRoute
+  AppMeetingsRoute: typeof AppMeetingsRoute
+  AppMemoryRoute: typeof AppMemoryRoute
+  AppNeedReplyRoute: typeof AppNeedReplyRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppContactsRoute: AppContactsRoute,
+  AppDraftsRoute: AppDraftsRoute,
+  AppFollowUpsRoute: AppFollowUpsRoute,
+  AppHomeRoute: AppHomeRoute,
+  AppInboxRoute: AppInboxRoute,
+  AppMeetingsRoute: AppMeetingsRoute,
+  AppMemoryRoute: AppMemoryRoute,
+  AppNeedReplyRoute: AppNeedReplyRoute,
+  AppSettingsRoute: AppSettingsRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
+interface OnboardingRouteChildren {
+  OnboardingAssistantRoute: typeof OnboardingAssistantRoute
+  OnboardingConnectRoute: typeof OnboardingConnectRoute
+  OnboardingProfileRoute: typeof OnboardingProfileRoute
+  OnboardingRoutinesRoute: typeof OnboardingRoutinesRoute
+  OnboardingIndexRoute: typeof OnboardingIndexRoute
+}
+
+const OnboardingRouteChildren: OnboardingRouteChildren = {
+  OnboardingAssistantRoute: OnboardingAssistantRoute,
+  OnboardingConnectRoute: OnboardingConnectRoute,
+  OnboardingProfileRoute: OnboardingProfileRoute,
+  OnboardingRoutinesRoute: OnboardingRoutinesRoute,
+  OnboardingIndexRoute: OnboardingIndexRoute,
+}
+
+const OnboardingRouteWithChildren = OnboardingRoute._addFileChildren(
+  OnboardingRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  OnboardingRoute: OnboardingRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
