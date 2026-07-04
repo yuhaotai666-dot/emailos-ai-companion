@@ -17,6 +17,7 @@ import { Route as OnboardingRoutinesRouteImport } from './routes/onboarding.rout
 import { Route as OnboardingProfileRouteImport } from './routes/onboarding.profile'
 import { Route as OnboardingConnectRouteImport } from './routes/onboarding.connect'
 import { Route as OnboardingAssistantRouteImport } from './routes/onboarding.assistant'
+import { Route as AppTodoRouteImport } from './routes/_app.todo'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
 import { Route as AppPeopleRouteImport } from './routes/_app.people'
 import { Route as AppMemoryRouteImport } from './routes/_app.memory'
@@ -64,6 +65,11 @@ const OnboardingAssistantRoute = OnboardingAssistantRouteImport.update({
   id: '/assistant',
   path: '/assistant',
   getParentRoute: () => OnboardingRoute,
+} as any)
+const AppTodoRoute = AppTodoRouteImport.update({
+  id: '/todo',
+  path: '/todo',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppSettingsRoute = AppSettingsRouteImport.update({
   id: '/settings',
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/memory': typeof AppMemoryRoute
   '/people': typeof AppPeopleRouteWithChildren
   '/settings': typeof AppSettingsRoute
+  '/todo': typeof AppTodoRoute
   '/onboarding/assistant': typeof OnboardingAssistantRoute
   '/onboarding/connect': typeof OnboardingConnectRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/memory': typeof AppMemoryRoute
   '/people': typeof AppPeopleRouteWithChildren
   '/settings': typeof AppSettingsRoute
+  '/todo': typeof AppTodoRoute
   '/onboarding/assistant': typeof OnboardingAssistantRoute
   '/onboarding/connect': typeof OnboardingConnectRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
@@ -151,6 +159,7 @@ export interface FileRoutesById {
   '/_app/memory': typeof AppMemoryRoute
   '/_app/people': typeof AppPeopleRouteWithChildren
   '/_app/settings': typeof AppSettingsRoute
+  '/_app/todo': typeof AppTodoRoute
   '/onboarding/assistant': typeof OnboardingAssistantRoute
   '/onboarding/connect': typeof OnboardingConnectRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
@@ -170,6 +179,7 @@ export interface FileRouteTypes {
     | '/memory'
     | '/people'
     | '/settings'
+    | '/todo'
     | '/onboarding/assistant'
     | '/onboarding/connect'
     | '/onboarding/profile'
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/memory'
     | '/people'
     | '/settings'
+    | '/todo'
     | '/onboarding/assistant'
     | '/onboarding/connect'
     | '/onboarding/profile'
@@ -204,6 +215,7 @@ export interface FileRouteTypes {
     | '/_app/memory'
     | '/_app/people'
     | '/_app/settings'
+    | '/_app/todo'
     | '/onboarding/assistant'
     | '/onboarding/connect'
     | '/onboarding/profile'
@@ -275,6 +287,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/onboarding/assistant'
       preLoaderRoute: typeof OnboardingAssistantRouteImport
       parentRoute: typeof OnboardingRoute
+    }
+    '/_app/todo': {
+      id: '/_app/todo'
+      path: '/todo'
+      fullPath: '/todo'
+      preLoaderRoute: typeof AppTodoRouteImport
+      parentRoute: typeof AppRoute
     }
     '/_app/settings': {
       id: '/_app/settings'
@@ -355,6 +374,7 @@ interface AppRouteChildren {
   AppMemoryRoute: typeof AppMemoryRoute
   AppPeopleRoute: typeof AppPeopleRouteWithChildren
   AppSettingsRoute: typeof AppSettingsRoute
+  AppTodoRoute: typeof AppTodoRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -365,6 +385,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppMemoryRoute: AppMemoryRoute,
   AppPeopleRoute: AppPeopleRouteWithChildren,
   AppSettingsRoute: AppSettingsRoute,
+  AppTodoRoute: AppTodoRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
