@@ -19,6 +19,7 @@ import { Route as OnboardingConnectRouteImport } from './routes/onboarding.conne
 import { Route as OnboardingAssistantRouteImport } from './routes/onboarding.assistant'
 import { Route as AppTodoRouteImport } from './routes/_app.todo'
 import { Route as AppSettingsRouteImport } from './routes/_app.settings'
+import { Route as AppPowersRouteImport } from './routes/_app.powers'
 import { Route as AppPeopleRouteImport } from './routes/_app.people'
 import { Route as AppMemoryRouteImport } from './routes/_app.memory'
 import { Route as AppMeetingsRouteImport } from './routes/_app.meetings'
@@ -76,6 +77,11 @@ const AppSettingsRoute = AppSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPowersRoute = AppPowersRouteImport.update({
+  id: '/powers',
+  path: '/powers',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPeopleRoute = AppPeopleRouteImport.update({
   id: '/people',
   path: '/people',
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/meetings': typeof AppMeetingsRoute
   '/memory': typeof AppMemoryRoute
   '/people': typeof AppPeopleRouteWithChildren
+  '/powers': typeof AppPowersRoute
   '/settings': typeof AppSettingsRoute
   '/todo': typeof AppTodoRoute
   '/onboarding/assistant': typeof OnboardingAssistantRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/meetings': typeof AppMeetingsRoute
   '/memory': typeof AppMemoryRoute
   '/people': typeof AppPeopleRouteWithChildren
+  '/powers': typeof AppPowersRoute
   '/settings': typeof AppSettingsRoute
   '/todo': typeof AppTodoRoute
   '/onboarding/assistant': typeof OnboardingAssistantRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/_app/meetings': typeof AppMeetingsRoute
   '/_app/memory': typeof AppMemoryRoute
   '/_app/people': typeof AppPeopleRouteWithChildren
+  '/_app/powers': typeof AppPowersRoute
   '/_app/settings': typeof AppSettingsRoute
   '/_app/todo': typeof AppTodoRoute
   '/onboarding/assistant': typeof OnboardingAssistantRoute
@@ -178,6 +187,7 @@ export interface FileRouteTypes {
     | '/meetings'
     | '/memory'
     | '/people'
+    | '/powers'
     | '/settings'
     | '/todo'
     | '/onboarding/assistant'
@@ -195,6 +205,7 @@ export interface FileRouteTypes {
     | '/meetings'
     | '/memory'
     | '/people'
+    | '/powers'
     | '/settings'
     | '/todo'
     | '/onboarding/assistant'
@@ -214,6 +225,7 @@ export interface FileRouteTypes {
     | '/_app/meetings'
     | '/_app/memory'
     | '/_app/people'
+    | '/_app/powers'
     | '/_app/settings'
     | '/_app/todo'
     | '/onboarding/assistant'
@@ -302,6 +314,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSettingsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/powers': {
+      id: '/_app/powers'
+      path: '/powers'
+      fullPath: '/powers'
+      preLoaderRoute: typeof AppPowersRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/people': {
       id: '/_app/people'
       path: '/people'
@@ -373,6 +392,7 @@ interface AppRouteChildren {
   AppMeetingsRoute: typeof AppMeetingsRoute
   AppMemoryRoute: typeof AppMemoryRoute
   AppPeopleRoute: typeof AppPeopleRouteWithChildren
+  AppPowersRoute: typeof AppPowersRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppTodoRoute: typeof AppTodoRoute
 }
@@ -384,6 +404,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppMeetingsRoute: AppMeetingsRoute,
   AppMemoryRoute: AppMemoryRoute,
   AppPeopleRoute: AppPeopleRouteWithChildren,
+  AppPowersRoute: AppPowersRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppTodoRoute: AppTodoRoute,
 }
