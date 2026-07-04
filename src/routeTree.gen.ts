@@ -9,38 +9,120 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as OnboardingIndexRouteImport } from './routes/onboarding.index'
+import { Route as OnboardingRoutinesRouteImport } from './routes/onboarding.routines'
+import { Route as OnboardingProfileRouteImport } from './routes/onboarding.profile'
+import { Route as OnboardingConnectRouteImport } from './routes/onboarding.connect'
+import { Route as OnboardingAssistantRouteImport } from './routes/onboarding.assistant'
 
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OnboardingIndexRoute = OnboardingIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => OnboardingRoute,
+} as any)
+const OnboardingRoutinesRoute = OnboardingRoutinesRouteImport.update({
+  id: '/routines',
+  path: '/routines',
+  getParentRoute: () => OnboardingRoute,
+} as any)
+const OnboardingProfileRoute = OnboardingProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => OnboardingRoute,
+} as any)
+const OnboardingConnectRoute = OnboardingConnectRouteImport.update({
+  id: '/connect',
+  path: '/connect',
+  getParentRoute: () => OnboardingRoute,
+} as any)
+const OnboardingAssistantRoute = OnboardingAssistantRouteImport.update({
+  id: '/assistant',
+  path: '/assistant',
+  getParentRoute: () => OnboardingRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/onboarding': typeof OnboardingRouteWithChildren
+  '/onboarding/assistant': typeof OnboardingAssistantRoute
+  '/onboarding/connect': typeof OnboardingConnectRoute
+  '/onboarding/profile': typeof OnboardingProfileRoute
+  '/onboarding/routines': typeof OnboardingRoutinesRoute
+  '/onboarding/': typeof OnboardingIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/onboarding/assistant': typeof OnboardingAssistantRoute
+  '/onboarding/connect': typeof OnboardingConnectRoute
+  '/onboarding/profile': typeof OnboardingProfileRoute
+  '/onboarding/routines': typeof OnboardingRoutinesRoute
+  '/onboarding': typeof OnboardingIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/onboarding': typeof OnboardingRouteWithChildren
+  '/onboarding/assistant': typeof OnboardingAssistantRoute
+  '/onboarding/connect': typeof OnboardingConnectRoute
+  '/onboarding/profile': typeof OnboardingProfileRoute
+  '/onboarding/routines': typeof OnboardingRoutinesRoute
+  '/onboarding/': typeof OnboardingIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/onboarding'
+    | '/onboarding/assistant'
+    | '/onboarding/connect'
+    | '/onboarding/profile'
+    | '/onboarding/routines'
+    | '/onboarding/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/onboarding/assistant'
+    | '/onboarding/connect'
+    | '/onboarding/profile'
+    | '/onboarding/routines'
+    | '/onboarding'
+  id:
+    | '__root__'
+    | '/'
+    | '/onboarding'
+    | '/onboarding/assistant'
+    | '/onboarding/connect'
+    | '/onboarding/profile'
+    | '/onboarding/routines'
+    | '/onboarding/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  OnboardingRoute: typeof OnboardingRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +130,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/onboarding/': {
+      id: '/onboarding/'
+      path: '/'
+      fullPath: '/onboarding/'
+      preLoaderRoute: typeof OnboardingIndexRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
+    '/onboarding/routines': {
+      id: '/onboarding/routines'
+      path: '/routines'
+      fullPath: '/onboarding/routines'
+      preLoaderRoute: typeof OnboardingRoutinesRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
+    '/onboarding/profile': {
+      id: '/onboarding/profile'
+      path: '/profile'
+      fullPath: '/onboarding/profile'
+      preLoaderRoute: typeof OnboardingProfileRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
+    '/onboarding/connect': {
+      id: '/onboarding/connect'
+      path: '/connect'
+      fullPath: '/onboarding/connect'
+      preLoaderRoute: typeof OnboardingConnectRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
+    '/onboarding/assistant': {
+      id: '/onboarding/assistant'
+      path: '/assistant'
+      fullPath: '/onboarding/assistant'
+      preLoaderRoute: typeof OnboardingAssistantRouteImport
+      parentRoute: typeof OnboardingRoute
+    }
   }
 }
 
+interface OnboardingRouteChildren {
+  OnboardingAssistantRoute: typeof OnboardingAssistantRoute
+  OnboardingConnectRoute: typeof OnboardingConnectRoute
+  OnboardingProfileRoute: typeof OnboardingProfileRoute
+  OnboardingRoutinesRoute: typeof OnboardingRoutinesRoute
+  OnboardingIndexRoute: typeof OnboardingIndexRoute
+}
+
+const OnboardingRouteChildren: OnboardingRouteChildren = {
+  OnboardingAssistantRoute: OnboardingAssistantRoute,
+  OnboardingConnectRoute: OnboardingConnectRoute,
+  OnboardingProfileRoute: OnboardingProfileRoute,
+  OnboardingRoutinesRoute: OnboardingRoutinesRoute,
+  OnboardingIndexRoute: OnboardingIndexRoute,
+}
+
+const OnboardingRouteWithChildren = OnboardingRoute._addFileChildren(
+  OnboardingRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  OnboardingRoute: OnboardingRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
