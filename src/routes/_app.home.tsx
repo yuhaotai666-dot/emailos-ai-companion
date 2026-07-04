@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { taskExamples } from "@/lib/mock-data";
-import { useBrief, useMeetings, useUserName } from "@/lib/api/queries";
+import { useBrief, useIvyChat, useMeetings, useUserName, type ChatEvent } from "@/lib/api/queries";
 import { EmptyState } from "@/components/workspace/Common";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,6 +26,12 @@ import {
   Trash2,
   ArrowUp,
 } from "lucide-react";
+
+interface ChatTurn {
+  role: "user" | "ivy";
+  text: string;
+  events?: ChatEvent[];
+}
 
 export const Route = createFileRoute("/_app/home")({
   head: () => ({
@@ -56,6 +62,9 @@ function HomePage() {
   const { data: userName = "there" } = useUserName();
   const { data: brief } = useBrief();
   const { data: meetings = [] } = useMeetings();
+  const ivy = useIvyChat();
+
+  const [thread, setThread] = useState<ChatTurn[]>([]);
 
   const todayMeetings = useMemo(
     () => meetings.filter((m) => /^today/i.test(m.time)),
@@ -71,11 +80,20 @@ function HomePage() {
       toast.success("Scheduled task created", {
         description: `${describeSchedule(t)} — Ivy will run this automatically.`,
       });
-    } else {
-      toast("Task received", {
-        description: "Ivy will work on this now. (Add words like 'every day' to schedule it.)",
-      });
+      setInput("");
+      return;
     }
+    // Everything else goes to Ivy — she plans, delegates to specialists, reviews.
+    setThread((t) => [...t, { role: "user", text: value }]);
+    ivy.mutate(value, {
+      onSuccess: (r) =>
+        setThread((t) => [...t, { role: "ivy", text: r.reply, events: r.events }]),
+      onError: () =>
+        setThread((t) => [
+          ...t,
+          { role: "ivy", text: "后端未启动 — 启动 backend 后我就能真正干活了。", events: [] },
+        ]),
+    });
     setInput("");
   }
 
@@ -135,6 +153,50 @@ function HomePage() {
               </div>
             </div>
           </div>
+
+          {/* Conversation with Ivy */}
+          {(thread.length > 0 || ivy.isPending) && (
+            <div className="mt-4 grid gap-2">
+              {thread.map((turn, i) => (
+                <div
+                  key={i}
+                  className={
+                    "rounded-2xl border px-4 py-3 text-sm leading-relaxed " +
+                    (turn.role === "user"
+                      ? "border-border bg-cream/60 text-foreground ml-10"
+                      : "border-border bg-card text-foreground mr-6 shadow-[var(--shadow-soft)]")
+                  }
+                >
+                  {turn.role === "ivy" && (
+                    <div className="mb-1 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                      <Sparkles className="h-3 w-3 text-accent" /> Ivy
+                    </div>
+                  )}
+                  <p className="whitespace-pre-wrap">{turn.text}</p>
+                  {turn.events && turn.events.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {turn.events.map((e, j) => (
+                        <span
+                          key={j}
+                          className="inline-flex items-center rounded-full border border-border bg-cream/70 px-2 py-0.5 text-[10px] text-muted-foreground"
+                        >
+                          {e.label}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+              {ivy.isPending && (
+                <div className="rounded-2xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground mr-6">
+                  <span className="inline-flex items-center gap-1.5">
+                    <Sparkles className="h-3 w-3 text-accent animate-pulse" />
+                    Ivy 正在规划 / 派活 / 审核…
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Example prompts */}
           <div className="mt-4 flex flex-wrap gap-2">

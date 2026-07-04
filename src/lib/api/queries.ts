@@ -202,3 +202,26 @@ export function useRunTriage() {
     },
   });
 }
+
+// ---- Ivy chat (supervisor agent) ----
+export interface ChatEvent {
+  kind: string;
+  label: string;
+}
+
+export interface ChatReply {
+  reply: string;
+  events: ChatEvent[];
+  conversation_id: string;
+}
+
+/** Send a message to Ivy; she plans, delegates to specialists, reviews, replies. */
+export function useIvyChat() {
+  return useMutation<ChatReply, Error, string>({
+    mutationFn: (message: string) =>
+      req<ChatReply>("/api/chat", {
+        method: "POST",
+        body: JSON.stringify({ message, conversation_id: "home" }),
+      }),
+  });
+}
