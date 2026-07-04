@@ -4,7 +4,7 @@ export function TrustBanner({ children }: { children?: ReactNode }) {
   return (
     <div className="rounded-2xl border border-border bg-cream/70 px-4 py-2.5 text-xs text-muted-foreground flex items-center gap-2">
       <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-      {children ?? "AI drafts. You approve. EmailOS never sends without your confirmation."}
+      {children ?? "AI drafts. You approve. Ivy never sends without your confirmation."}
     </div>
   );
 }

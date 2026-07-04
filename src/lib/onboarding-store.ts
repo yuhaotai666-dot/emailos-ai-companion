@@ -22,7 +22,7 @@ export const useOnboarding = create<OnboardingState>()(
       timezone: "America/Los_Angeles",
       theme: "system",
       connections: { gmail: true },
-      assistantName: "EmailOS",
+      assistantName: "Ivy",
       persona: "professional",
       personality: "Professional",
       routines: {

@@ -76,14 +76,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "EmailOS AI — Your personal email chief of staff" },
+      { title: "Ivy — Your personal email chief of staff" },
       {
         name: "description",
         content:
-          "EmailOS AI turns your inbox into a calm review queue. It drafts replies, surfaces what matters, and never sends without your approval.",
+          "Ivy turns your inbox into a calm review queue. It drafts replies, surfaces what matters, and never sends without your approval.",
       },
-      { name: "author", content: "EmailOS AI" },
-      { property: "og:title", content: "EmailOS AI — Your personal email chief of staff" },
+      { name: "author", content: "Ivy" },
+      { property: "og:title", content: "Ivy — Your personal email chief of staff" },
       {
         property: "og:description",
         content:

@@ -31,7 +31,7 @@ function WelcomeStep() {
       step={1}
       hideBack
       title="Let's get your inbox organized."
-      subtitle="EmailOS AI learns from your inbox, drafts replies, and helps you stay on top of what matters."
+      subtitle="Ivy learns from your inbox, drafts replies, and helps you stay on top of what matters."
       primaryLabel="Let's get started"
       onPrimary={() => nav({ to: "/onboarding/connect" })}
     >
@@ -80,7 +80,7 @@ function WelcomeStep() {
 
       <p className="mt-6 text-xs text-muted-foreground flex items-center gap-2">
         <ShieldCheck className="h-3.5 w-3.5" />
-        EmailOS AI never sends emails without your confirmation.
+        Ivy never sends emails without your confirmation.
       </p>
     </OnboardingCard>
   );

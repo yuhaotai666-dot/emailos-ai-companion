@@ -12,7 +12,7 @@ import { ManageEventsDialog } from "@/components/workspace/ManageEventsDialog";
 export const Route = createFileRoute("/_app/inbox")({
   head: () => ({
     meta: [
-      { title: "Email — EmailOS AI" },
+      { title: "Email — Ivy" },
       { name: "description", content: "Your email, turned into a calm review queue." },
     ],
   }),
@@ -45,7 +45,7 @@ function InboxPage() {
     <div className="mx-auto max-w-5xl px-6 lg:px-10 py-10">
       <PageHeader
         title="Your email, turned into a review queue."
-        subtitle="EmailOS separates what matters from what can wait."
+        subtitle="Ivy separates what matters from what can wait."
       />
 
       <div className="mb-6">
