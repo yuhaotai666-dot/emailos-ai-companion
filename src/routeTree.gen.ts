@@ -17,8 +17,15 @@ import { Route as OnboardingRoutinesRouteImport } from './routes/onboarding.rout
 import { Route as OnboardingProfileRouteImport } from './routes/onboarding.profile'
 import { Route as OnboardingConnectRouteImport } from './routes/onboarding.connect'
 import { Route as OnboardingAssistantRouteImport } from './routes/onboarding.assistant'
+import { Route as AppSettingsRouteImport } from './routes/_app.settings'
+import { Route as AppNeedReplyRouteImport } from './routes/_app.need-reply'
+import { Route as AppMemoryRouteImport } from './routes/_app.memory'
+import { Route as AppMeetingsRouteImport } from './routes/_app.meetings'
 import { Route as AppInboxRouteImport } from './routes/_app.inbox'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
+import { Route as AppFollowUpsRouteImport } from './routes/_app.follow-ups'
+import { Route as AppDraftsRouteImport } from './routes/_app.drafts'
+import { Route as AppContactsRouteImport } from './routes/_app.contacts'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -59,6 +66,26 @@ const OnboardingAssistantRoute = OnboardingAssistantRouteImport.update({
   path: '/assistant',
   getParentRoute: () => OnboardingRoute,
 } as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppNeedReplyRoute = AppNeedReplyRouteImport.update({
+  id: '/need-reply',
+  path: '/need-reply',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMemoryRoute = AppMemoryRouteImport.update({
+  id: '/memory',
+  path: '/memory',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMeetingsRoute = AppMeetingsRouteImport.update({
+  id: '/meetings',
+  path: '/meetings',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppInboxRoute = AppInboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
@@ -69,12 +96,34 @@ const AppHomeRoute = AppHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AppRoute,
 } as any)
+const AppFollowUpsRoute = AppFollowUpsRouteImport.update({
+  id: '/follow-ups',
+  path: '/follow-ups',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDraftsRoute = AppDraftsRouteImport.update({
+  id: '/drafts',
+  path: '/drafts',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppContactsRoute = AppContactsRouteImport.update({
+  id: '/contacts',
+  path: '/contacts',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/onboarding': typeof OnboardingRouteWithChildren
+  '/contacts': typeof AppContactsRoute
+  '/drafts': typeof AppDraftsRoute
+  '/follow-ups': typeof AppFollowUpsRoute
   '/home': typeof AppHomeRoute
   '/inbox': typeof AppInboxRoute
+  '/meetings': typeof AppMeetingsRoute
+  '/memory': typeof AppMemoryRoute
+  '/need-reply': typeof AppNeedReplyRoute
+  '/settings': typeof AppSettingsRoute
   '/onboarding/assistant': typeof OnboardingAssistantRoute
   '/onboarding/connect': typeof OnboardingConnectRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
@@ -83,8 +132,15 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/contacts': typeof AppContactsRoute
+  '/drafts': typeof AppDraftsRoute
+  '/follow-ups': typeof AppFollowUpsRoute
   '/home': typeof AppHomeRoute
   '/inbox': typeof AppInboxRoute
+  '/meetings': typeof AppMeetingsRoute
+  '/memory': typeof AppMemoryRoute
+  '/need-reply': typeof AppNeedReplyRoute
+  '/settings': typeof AppSettingsRoute
   '/onboarding/assistant': typeof OnboardingAssistantRoute
   '/onboarding/connect': typeof OnboardingConnectRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
@@ -96,8 +152,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/onboarding': typeof OnboardingRouteWithChildren
+  '/_app/contacts': typeof AppContactsRoute
+  '/_app/drafts': typeof AppDraftsRoute
+  '/_app/follow-ups': typeof AppFollowUpsRoute
   '/_app/home': typeof AppHomeRoute
   '/_app/inbox': typeof AppInboxRoute
+  '/_app/meetings': typeof AppMeetingsRoute
+  '/_app/memory': typeof AppMemoryRoute
+  '/_app/need-reply': typeof AppNeedReplyRoute
+  '/_app/settings': typeof AppSettingsRoute
   '/onboarding/assistant': typeof OnboardingAssistantRoute
   '/onboarding/connect': typeof OnboardingConnectRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
@@ -109,8 +172,15 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/onboarding'
+    | '/contacts'
+    | '/drafts'
+    | '/follow-ups'
     | '/home'
     | '/inbox'
+    | '/meetings'
+    | '/memory'
+    | '/need-reply'
+    | '/settings'
     | '/onboarding/assistant'
     | '/onboarding/connect'
     | '/onboarding/profile'
@@ -119,8 +189,15 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/contacts'
+    | '/drafts'
+    | '/follow-ups'
     | '/home'
     | '/inbox'
+    | '/meetings'
+    | '/memory'
+    | '/need-reply'
+    | '/settings'
     | '/onboarding/assistant'
     | '/onboarding/connect'
     | '/onboarding/profile'
@@ -131,8 +208,15 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/onboarding'
+    | '/_app/contacts'
+    | '/_app/drafts'
+    | '/_app/follow-ups'
     | '/_app/home'
     | '/_app/inbox'
+    | '/_app/meetings'
+    | '/_app/memory'
+    | '/_app/need-reply'
+    | '/_app/settings'
     | '/onboarding/assistant'
     | '/onboarding/connect'
     | '/onboarding/profile'
@@ -204,6 +288,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingAssistantRouteImport
       parentRoute: typeof OnboardingRoute
     }
+    '/_app/settings': {
+      id: '/_app/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/need-reply': {
+      id: '/_app/need-reply'
+      path: '/need-reply'
+      fullPath: '/need-reply'
+      preLoaderRoute: typeof AppNeedReplyRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/memory': {
+      id: '/_app/memory'
+      path: '/memory'
+      fullPath: '/memory'
+      preLoaderRoute: typeof AppMemoryRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/meetings': {
+      id: '/_app/meetings'
+      path: '/meetings'
+      fullPath: '/meetings'
+      preLoaderRoute: typeof AppMeetingsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/inbox': {
       id: '/_app/inbox'
       path: '/inbox'
@@ -218,17 +330,52 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHomeRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/follow-ups': {
+      id: '/_app/follow-ups'
+      path: '/follow-ups'
+      fullPath: '/follow-ups'
+      preLoaderRoute: typeof AppFollowUpsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/drafts': {
+      id: '/_app/drafts'
+      path: '/drafts'
+      fullPath: '/drafts'
+      preLoaderRoute: typeof AppDraftsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/contacts': {
+      id: '/_app/contacts'
+      path: '/contacts'
+      fullPath: '/contacts'
+      preLoaderRoute: typeof AppContactsRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppContactsRoute: typeof AppContactsRoute
+  AppDraftsRoute: typeof AppDraftsRoute
+  AppFollowUpsRoute: typeof AppFollowUpsRoute
   AppHomeRoute: typeof AppHomeRoute
   AppInboxRoute: typeof AppInboxRoute
+  AppMeetingsRoute: typeof AppMeetingsRoute
+  AppMemoryRoute: typeof AppMemoryRoute
+  AppNeedReplyRoute: typeof AppNeedReplyRoute
+  AppSettingsRoute: typeof AppSettingsRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppContactsRoute: AppContactsRoute,
+  AppDraftsRoute: AppDraftsRoute,
+  AppFollowUpsRoute: AppFollowUpsRoute,
   AppHomeRoute: AppHomeRoute,
   AppInboxRoute: AppInboxRoute,
+  AppMeetingsRoute: AppMeetingsRoute,
+  AppMemoryRoute: AppMemoryRoute,
+  AppNeedReplyRoute: AppNeedReplyRoute,
+  AppSettingsRoute: AppSettingsRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
