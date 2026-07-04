@@ -1,78 +1,69 @@
+## Goal
 
-## People page — AI relationship memory
+Replace hardcoded email `category` labels with a user-managed **Events** system. Each email can be tagged with **one event** representing the event it belongs to. Events are shared globally and reusable across emails.
 
-Rename `/contacts` to `/people` and rebuild it as a lightweight AI relationship memory system. Add a detail route per person with a full AI-generated profile. Sidebar link updated. Mock data only.
+## Data model (`src/lib/mock-data.ts`)
 
-### Routes
+- Add `Event` type: `{ id, name, color }` where color is one of a small preset palette (amber, blue, rose, green, violet, slate).
+- Add `mockEvents` seed list (~5 events tied to SuperIntern context, e.g. "Krishna Partnership", "Q4 Payout Batch", "Maya Onboarding", "Access Issues", "Podcast Sponsorship").
+- Extend `Email` with optional `eventId?: string`. Keep existing `category` for the AI classification pill (unchanged).
+- Add a lightweight in-memory store `src/lib/events-store.ts` using `zustand` (already in project) or a simple module-level store + subscription hook, exposing:
+  - `events`, `addEvent(name, color)`, `renameEvent`, `deleteEvent`
+  - `emailEventMap: Record<emailId, eventId>`, `setEmailEvent(emailId, eventId | null)`
+  - Seeded from mock data on init. Persist to `localStorage` so labels survive reload.
 
-- `src/routes/_app.people.tsx` — list view (replaces `_app.contacts.tsx`, which is deleted).
-- `src/routes/_app.people.$personId.tsx` — detail view.
+## Inbox UI (`src/routes/_app.inbox.tsx`)
 
-Update sidebar entry in `src/components/workspace/AppSidebar.tsx` from "Contacts" → "People" pointing to `/people`. Each route has its own `head()` title/description.
+### Top of page — two filter rows
 
-### Mock data (extend `src/lib/mock-data.ts`)
+1. **Priority row (existing):** All / Need Reply / Important / FYI / Low Priority — kept as-is.
+2. **Event row (new):** horizontal chip strip below priority row:
+   - `All events` + one chip per event (colored dot + name + count).
+   - Trailing `+ New event` chip opens the Manage Events popover.
+   - Active chip uses tinted background matching the event color.
 
-Extend `mockContacts` into a richer `mockPeople` array (keep old export as alias to avoid breaking anything). Each person has:
+Both filters combine with AND. Empty state when zero matches.
 
-- `id`, `name`, `email`, `company`, `role`, `channel` (website/YouTube/Slack), `socials` (twitter/youtube/linkedin optional)
-- `relationship`: `Creator Partner | Influencer | Internal Team | Finance | Product Access | Sales Lead | Customer | Personal`
-- `status`: `Needs reply | Waiting for them | Waiting for payment | Video in review | Access issue | Active collaboration | Paused`
-- `aiDescription` — 1–2 sentence AI summary
-- `whoTheyAre` — longer AI paragraph
-- `relationshipContext` — how user knows them, stage, active/paused
-- `lastContacted`, `openThreads: number`
-- `threads[]` — `{ subject, snippet, needsReplyFrom: 'you'|'them', suggestedNext }`
-- `suggestedNextAction` — single clear recommendation string
-- `communicationStyle` — `{ tone: string[], notes: string }`
-- `importantContext[]` — key/value list (Agreed rate, Payment status, Video status, Product access, Referral code, Tracking link, Deadlines, Risks)
-- `uncertainties[]` — strings
-- `claims[]` — `{ text, sourceType: 'email'|'meeting'|'manual note', observedDate, confidence: 'high'|'medium'|'low' }`
+### Email card — label control next to "Mark done"
 
-Seed ~6 people tied to existing mock threads: Krishna Patel (Creator Partner, Waiting for payment), Maya Chen (Influencer, Video in review), PJ Okoye (Creator Partner, Needs reply), Max Herrera (Product Access, Access issue), Ana Rivera (Internal Team, Active collaboration), Rina Alvarez (Sales Lead, Waiting for them), Finance @ SuperIntern (Finance, Active collaboration).
+In the row that currently holds Mark done / Draft reply actions, add a new `EventLabelPicker` button placed immediately beside Mark done:
 
-### List page (`/people`)
+- Idle state (no event): ghost button `Tag` icon + "Add event".
+- Assigned state: colored dot + event name in a subtle pill; click reopens picker; small `×` to clear.
+- Click opens a `Popover` (shadcn) with:
+  - Search input
+  - Scrollable list of existing events (colored dot + name, checkmark on current)
+  - `+ Create "<query>"` row when the query has no exact match
+  - Footer link `Manage events…`
 
-Top of page:
-- `PageHeader` title "People" with subtitle.
-- Notice card (reuses `TrustBanner`-style pattern): "EmailOS builds working profiles from your conversations. You can edit or delete anything it remembers."
-- Action row: `Create contact`, `Import contacts`, `Enable Google Contacts` (buttons wired to `sonner` toasts — no real logic).
+### Manage Events dialog
 
-Below: card list (responsive: table-like row on desktop, stacked card on mobile). Each row shows avatar initials, name, email, company/channel, `RelationshipBadge`, `StatusBadge`, short AI description, last contacted, open thread count pill, and an "Open" action button linking to `/people/$personId`.
+A `Dialog` reachable from the `+ New event` chip and the picker footer:
+- List of events with inline rename, color swatch dropdown, delete.
+- "New event" input with color picker.
+- Deleting an event clears it from any emails that used it (with confirm).
 
-New small components (co-located, no new files unless needed):
-- `RelationshipBadge` and `StatusBadge` — extend `src/components/workspace/Badges.tsx` with color-coded variants per type/status.
+## Component additions
 
-### Detail page (`/people/$personId`)
+- `src/components/workspace/EventBadge.tsx` — colored dot + name pill (sizes sm/md).
+- `src/components/workspace/EventLabelPicker.tsx` — the popover picker described above.
+- `src/components/workspace/EventFilterBar.tsx` — the chip strip.
+- `src/components/workspace/ManageEventsDialog.tsx` — the dialog.
 
-Two-column layout on desktop, single column on mobile. Left column: identity + suggested next action pinned near top. Right column: sections below.
+All use existing shadcn primitives (`Popover`, `Command`, `Dialog`, `Input`, `Button`) and reuse the cream/border/muted tokens. No new npm packages.
 
-Sections (each as a rounded card matching existing `bg-card` / `shadow-[var(--shadow-soft)]` style):
+## Search params
 
-1. **Contact** — email, company, role, channel/website, social handles.
-2. **Who they are** — AI summary paragraph.
-3. **Your relationship** — how user knows them, stage, active/paused indicator.
-4. **Recent / Open threads** — list of threads with "Needs reply from you/them" tag and suggested next step per thread.
-5. **Suggested next action** — prominent callout card with a primary action button (toast).
-6. **Communication style** — tone chips + notes.
-7. **Important context** — two-column key/value grid.
-8. **Uncertainties** — muted bulleted list with a subtle "low-confidence" treatment.
-9. **Claims / Sources** — list where each item shows text, source type icon (Mail / Calendar / StickyNote), observed date, and a confidence pill (high/medium/low).
+Add `event?: string` to Inbox `validateSearch` (via `@tanstack/zod-adapter` `fallback`) so the active event filter is shareable/reload-safe alongside the existing priority filter (if any). Reset button clears both.
 
-Header row: back link to `/people`, name, relationship + status badges, "Edit" and "Delete" buttons (toast placeholders — matches the notice card promise).
+## Out of scope
 
-If `personId` doesn't match, render `notFound()` with a `notFoundComponent`.
+- No change to the AI `category` pill on emails (Payment / Meeting / FYI…). Events are user-defined and additional to it.
+- No change to other pages (People, Drafts, Follow-ups). Event tagging is Inbox-only in this pass; the store is designed to extend later.
+- No backend — everything is client mock data + localStorage.
 
-### Design notes
+## Technical notes
 
-- Reuse existing tokens (cream, border, muted). No new colors.
-- Badges use subtle tinted backgrounds — status colors differentiated but staying calm (e.g. amber tint for "Waiting for payment", blue for "Video in review", rose for "Access issue", green for "Active collaboration", neutral for "Paused").
-- Instrument Serif for section titles, Inter for body — matches current pages.
-- No new packages.
-
-### Technical details
-
-- Delete `src/routes/_app.contacts.tsx`; router auto-regenerates `routeTree.gen.ts`.
-- `createFileRoute("/_app/people")` and `createFileRoute("/_app/people/$personId")`.
-- Detail route uses `Route.useParams()` to look up person; missing person → `throw notFound()` with a `notFoundComponent` that offers a link back to `/people`.
-- All buttons (Create/Import/Enable Google Contacts/Edit/Delete/Next action) call `toast(...)` — no state mutation required.
-- Keep mock data pure — no server functions, no Lovable Cloud.
+- Use `useSyncExternalStore` or `zustand` for the store so the picker, filter bar, and email list update in sync.
+- Keep colors as semantic classes (e.g. `bg-amber-100 text-amber-900 border-amber-200`) mapped from `event.color` via a small helper — no arbitrary hex in components.
+- Preserve current Inbox layout, spacing, and typography. Only the two additions (event chip row + label picker beside Mark done) are new visual elements.
