@@ -467,7 +467,7 @@ function IntegrationsTab() {
     <div>
       <SectionHeader
         title="Integrations"
-        subtitle="Connect the tools you use and let Ivy perform tasks across them."
+        subtitle="Connect third-party services like Gmail, Calendar, and WhatsApp so Ivy can act across the tools you already use."
       />
 
       <div className="flex items-center gap-3 mb-5">
