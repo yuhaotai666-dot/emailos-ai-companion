@@ -1,68 +1,82 @@
 ## Goal
 
-Remove Need Reply and Drafts pages, add a Calendar page in their place.
+Add a **To-do** page that aggregates the user's personal action items surfaced by the meeting AI (from each meeting's follow-up `todos`). Only items owned by the user (Theo) show up — this is "my to-do list", not the whole team's.
 
 ## Changes
 
-### 1. Delete routes
-- `src/routes/_app.need-reply.tsx`
-- `src/routes/_app.drafts.tsx`
+### 1. Sidebar (`AppSidebar.tsx`)
+Insert a "To-do" entry (icon `ListChecks`) between Calendar and Meetings.
 
-### 2. Sidebar (`src/components/workspace/AppSidebar.tsx`)
-Replace the "Need Reply" and "Drafts" entries with a single "Calendar" entry (icon `CalendarDays`). Remove now-unused `MessageSquareReply` and `PenLine` imports. Keep Meetings entry as-is.
+Final order: Home · Inbox · Calendar · **To-do** · Meetings · People · Memory · Settings.
 
-Final order: Home · Inbox · Calendar · Meetings · People · Memory · Settings.
+### 2. New route `src/routes/_app.todo.tsx`
 
-### 3. New page `src/routes/_app.calendar.tsx`
+Route path `/todo`. Layout consistent with other pages (`max-w-5xl`, `PageHeader`).
 
-A calm month-view calendar consistent with the existing cream/border/shadow-soft design language.
+**Header:**
+- Title: "Your to-do list"
+- Subtitle: "Action items your meeting assistant pulled out for you."
 
-Layout (`max-w-5xl px-6 lg:px-10 py-10`):
-- `PageHeader` — title "Calendar", subtitle "Your meetings and email-driven events in one calm view."
-- Toolbar row:
-  - Left: `‹` / `›` buttons + current month/year label (`font-serif text-xl`) + "Today" button
-  - Right: view switcher chips (Month / Week) — Month active, Week shows a "Coming soon" toast
-- Month grid:
-  - 7-column grid, Sun–Sat header row
-  - 6 week rows (42 cells) built from `startOfMonth` + weekday offset (pure date math, no date-fns dependency)
-  - Each cell: rounded-lg border, `bg-card` for current month days / `bg-cream/30` for adjacent-month days, `text-muted-foreground` for those. Today gets a filled `bg-foreground text-background` circle around the date number.
-  - Cell shows up to 2 event pills; if more, "+N more" muted line.
-- Below grid: "Upcoming this week" section — vertical list of the next ~4 events with time, title, source badge.
+**Source note card** (small, muted): "These items were surfaced by EmailOS from your meeting follow-ups. Complete them here or in the original meeting."
 
-### 4. Event data source
+**Filter chips row:** All · Open · Done · By meeting (dropdown/simple chips per meeting title).
 
-Derive calendar events from existing `mockMeetings` plus a few seeded email-driven events (e.g. "Payment run — creators", "Publish window — Maya video"). Add `mockCalendarEvents` array to `src/lib/mock-data.ts`:
+**List:**
+Each todo row:
+- Checkbox (toggles done/open — local state, persisted via zustand + localStorage)
+- Task text (strike-through when done, muted color)
+- Due badge (small pill) if present
+- Right side: source chip "From: <meeting title>" — clicking navigates to `/meetings`
+- Subtle hover state, `bg-card` rounded row with border
 
-```ts
-export interface CalendarEvent {
-  id: string;
-  title: string;
-  date: string;      // ISO yyyy-mm-dd
-  time?: string;     // "2:00 PM"
-  source: "meeting" | "email" | "reminder";
-  meetingId?: string;
+Empty state when no todos match filter.
+
+**Bottom summary:** "N open · M done" small footer text.
+
+### 3. Data source
+
+Reuse the `followUp.todos` already on `mockMeetings` (added in the previous meetings feature). Filter to items where `owner` is the user — treat `"Theo"` (and any owner string containing "theo", case-insensitive) as the user's items.
+
+Aggregate at render time:
+```
+const myTodos = mockMeetings.flatMap(m =>
+  m.followUp.todos
+    .filter(t => t.owner.toLowerCase().includes("theo"))
+    .map((t, i) => ({
+      id: `${m.id}-${i}`,
+      meetingId: m.id,
+      meetingTitle: m.title,
+      task: t.task,
+      due: t.due,
+    }))
+);
+```
+
+No new mock data added — the meeting AI is the sole source, as the user described.
+
+### 4. Done-state store (`src/lib/todo-store.ts`)
+
+Small zustand + persist store:
+```
+{
+  doneMap: Record<todoId, boolean>,
+  toggle(id): void,
 }
 ```
+Persisted key: `emailos-todos-v1`. Keeps completion state across reloads. No creation/deletion — todos are always derived from meetings.
 
-Seed ~8 events across the current week/month so the grid looks alive. Anchor dates around `new Date()` at runtime (compute today + N days) so the calendar is always populated relative to the viewing date.
+### 5. Home page nudge (optional, minimal)
+If `_app.home.tsx` currently has a "Follow-ups" or similar block, leave it alone. Not touching Home in this pass unless a broken link exists.
 
-Event pills use subtle tinted classes per `source`:
-- meeting → blue tint
-- email → amber tint
-- reminder → slate tint
-
-### 5. Head metadata
+### 6. Head metadata
 ```
-title: "Calendar — EmailOS AI"
-description: "Your meetings and email-driven events in one calm view."
+title: "To-do — EmailOS AI"
+description: "Personal action items your meeting assistant pulled out for you."
 ```
-Plus matching og:title/og:description.
-
-### 6. Cleanup
-- Search for any residual `to="/need-reply"` / `to="/drafts"` `<Link>` usages (home page, empty states) — replace with `/inbox` or remove.
-- `__root.tsx` description string mentions "Drafts, follow-ups"; leave marketing copy untouched (not a route reference).
++ matching og tags.
 
 ## Out of scope
-- No new npm packages (no date-fns, no react-day-picker for the month grid — it's a static display, not a date input).
-- No drag-and-drop, no event creation UI. Clicking a meeting event navigates to `/meetings`; clicking any other event shows a toast placeholder.
-- Mobile: grid collapses to smaller cells but stays 7-column; that's acceptable for this pass.
+- No manual todo creation, no editing text, no reordering, no assignments to others.
+- No due-date picker; `due` is displayed as-is from the meeting summary.
+- No push to calendar or email.
+- No changes to Meetings page's todo rendering.
