@@ -1,54 +1,68 @@
 ## Goal
 
-删除 Follow-ups 独立页面,将 follow-up 功能整合到 Meetings 页面。每个 meeting 卡片下方展示一封 AI 自动总结的 follow-up 邮件(会议纪要 + to-do list),自动发送给所有参会人。
+Remove Need Reply and Drafts pages, add a Calendar page in their place.
 
 ## Changes
 
-### 1. 删除 Follow-ups 页面
-- 删除 `src/routes/_app.follow-ups.tsx`
-- `AppSidebar.tsx` 移除 "Follow-ups" 菜单项(同时移除未使用的 `MessageSquareReply`/`ListChecks` 图标 import 如无其他引用)
-- 检查并清理 Home 页(`_app.home.tsx`) 里可能存在的 Follow-ups 跳转/引用,若仅是文案则保留
+### 1. Delete routes
+- `src/routes/_app.need-reply.tsx`
+- `src/routes/_app.drafts.tsx`
 
-### 2. Mock data 扩展 (`src/lib/mock-data.ts`)
-在每个 meeting 上新增 `followUp` 字段:
-```
-followUp: {
-  status: "draft" | "sent",           // 默认 "draft"
-  generatedAt: string,                 // "2 min after meeting"
-  recipients: string[],                // = attendees
-  subject: string,                     // "Recap & next steps — <meeting title>"
-  summary: string,                     // 2-3 句 AI 会议摘要
-  todos: { owner: string; task: string; due?: string }[],
+### 2. Sidebar (`src/components/workspace/AppSidebar.tsx`)
+Replace the "Need Reply" and "Drafts" entries with a single "Calendar" entry (icon `CalendarDays`). Remove now-unused `MessageSquareReply` and `PenLine` imports. Keep Meetings entry as-is.
+
+Final order: Home · Inbox · Calendar · Meetings · People · Memory · Settings.
+
+### 3. New page `src/routes/_app.calendar.tsx`
+
+A calm month-view calendar consistent with the existing cream/border/shadow-soft design language.
+
+Layout (`max-w-5xl px-6 lg:px-10 py-10`):
+- `PageHeader` — title "Calendar", subtitle "Your meetings and email-driven events in one calm view."
+- Toolbar row:
+  - Left: `‹` / `›` buttons + current month/year label (`font-serif text-xl`) + "Today" button
+  - Right: view switcher chips (Month / Week) — Month active, Week shows a "Coming soon" toast
+- Month grid:
+  - 7-column grid, Sun–Sat header row
+  - 6 week rows (42 cells) built from `startOfMonth` + weekday offset (pure date math, no date-fns dependency)
+  - Each cell: rounded-lg border, `bg-card` for current month days / `bg-cream/30` for adjacent-month days, `text-muted-foreground` for those. Today gets a filled `bg-foreground text-background` circle around the date number.
+  - Cell shows up to 2 event pills; if more, "+N more" muted line.
+- Below grid: "Upcoming this week" section — vertical list of the next ~4 events with time, title, source badge.
+
+### 4. Event data source
+
+Derive calendar events from existing `mockMeetings` plus a few seeded email-driven events (e.g. "Payment run — creators", "Publish window — Maya video"). Add `mockCalendarEvents` array to `src/lib/mock-data.ts`:
+
+```ts
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  date: string;      // ISO yyyy-mm-dd
+  time?: string;     // "2:00 PM"
+  source: "meeting" | "email" | "reminder";
+  meetingId?: string;
 }
 ```
-为 3 个 mock meetings 各写一封贴合 SuperIntern 场景的 follow-up(Maya 视频、Rina 合作、Ana 定位视频)。
 
-### 3. Meetings 页面重构 (`src/routes/_app.meetings.tsx`)
-把每个会议卡片拆成两块视觉层次:
+Seed ~8 events across the current week/month so the grid looks alive. Anchor dates around `new Date()` at runtime (compute today + N days) so the calendar is always populated relative to the viewing date.
 
-**上半部分(保留):** meeting title、时间、参会人、Prep notes / Suggested questions / Action items 三栏。
-
-**下半部分(新增)——AI Follow-up email 卡片:**
-- 顶部一行:`Sparkles` 图标 + 标题 "AI follow-up email"、右侧状态 badge(Draft / Sent)、"Generated 2 min after meeting" 小字
-- 收件人行:`To: <所有参会人>` chips
-- Subject 行:粗体主题
-- **Summary 区块:** 段落文字,`bg-cream/60` rounded 卡片,标签 "Meeting summary"
-- **To-do list 区块:** 每条一行,checkbox + `owner` 小徽章 + task 文本 + optional due 日期灰字
-- 底部按钮行:
-  - Primary: "Send to all attendees" (Draft 状态时可点,点击后本地 state 切到 Sent,toast 提示;Sent 状态显示 "Sent to N people ·  time")
-  - Secondary: "Edit" / "Regenerate"(仅 toast placeholder)
-
-样式复用现有 `bg-card` / border / `shadow-soft` 与 cream tokens,不引入新颜色。整个 follow-up 区块用 `border-t border-dashed` 与上半部分分隔,或独立子卡片(inner `bg-background/60` rounded-xl)。
-
-### 4. 状态管理
-- 用组件内 `useState<Record<meetingId, "draft"|"sent">>` 追踪发送状态(重载后重置,足够 mock 演示)
-- 不引入 zustand persist(follow-ups 不需要持久化)
-- 使用现有 `sonner` toast 提示 "Follow-up sent to N attendees"
+Event pills use subtle tinted classes per `source`:
+- meeting → blue tint
+- email → amber tint
+- reminder → slate tint
 
 ### 5. Head metadata
-更新 meetings 页 description: "Meeting prep, notes, and AI-generated follow-up emails ready to send to attendees."
+```
+title: "Calendar — EmailOS AI"
+description: "Your meetings and email-driven events in one calm view."
+```
+Plus matching og:title/og:description.
+
+### 6. Cleanup
+- Search for any residual `to="/need-reply"` / `to="/drafts"` `<Link>` usages (home page, empty states) — replace with `/inbox` or remove.
+- `__root.tsx` description string mentions "Drafts, follow-ups"; leave marketing copy untouched (not a route reference).
 
 ## Out of scope
-- 不接入真实 AI(纯 mock 静态文本)
-- 不新增页面路由
-- 不改动 People / Inbox / Home 的其他部分
+- No new npm packages (no date-fns, no react-day-picker for the month grid — it's a static display, not a date input).
+- No drag-and-drop, no event creation UI. Clicking a meeting event navigates to `/meetings`; clicking any other event shows a toast placeholder.
+- Mobile: grid collapses to smaller cells but stays 7-column; that's acceptable for this pass.
