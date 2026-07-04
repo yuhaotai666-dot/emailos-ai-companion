@@ -203,6 +203,24 @@ export function useRunTriage() {
   });
 }
 
+// ---- Ivy's specialist team ----
+export interface Specialist {
+  id: string;
+  name: string;
+  description: string;
+  tools: string[];
+  runs: number;
+  created_at: string;
+  last_used_at?: string | null;
+}
+
+export function useSpecialists() {
+  return useQuery<Specialist[]>({
+    queryKey: ["specialists"],
+    queryFn: () => withFallback(() => req<Specialist[]>("/api/specialists"), []),
+  });
+}
+
 // ---- Ivy chat (supervisor agent) ----
 export interface ChatEvent {
   kind: string;
