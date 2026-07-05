@@ -251,6 +251,7 @@ function InboxPage() {
                     size="sm"
                     className="rounded-full h-8 text-xs bg-foreground text-background hover:opacity-90"
                     disabled={!replyBody.trim()}
+                    onClick={() => openEmail && handleSendReply(openEmail.id)}
                   >
                     <Send className="h-3.5 w-3.5 mr-1" />
                     Send reply
