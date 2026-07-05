@@ -84,7 +84,7 @@ function InboxPage() {
         subtitle="Ivy separates what matters from what can wait."
       />
 
-      <div className="mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <EventFilterBar
           value={eventFilter}
           onChange={setEventFilter}
