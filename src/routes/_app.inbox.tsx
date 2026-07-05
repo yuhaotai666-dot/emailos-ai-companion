@@ -10,7 +10,7 @@ import { useEventsStore } from "@/lib/events-store";
 import { EventFilterBar } from "@/components/workspace/EventFilterBar";
 import { EventLabelPicker } from "@/components/workspace/EventLabelPicker";
 import { ManageEventsDialog } from "@/components/workspace/ManageEventsDialog";
-import { Send, X } from "lucide-react";
+import { Send, X, RefreshCw } from "lucide-react";
 
 
 export const Route = createFileRoute("/_app/inbox")({
