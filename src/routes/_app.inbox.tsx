@@ -26,6 +26,14 @@ export const Route = createFileRoute("/_app/inbox")({
 function InboxPage() {
   const [eventFilter, setEventFilter] = useState<string | "all">("all");
   const [manageOpen, setManageOpen] = useState(false);
+  const [openEmail, setOpenEmail] = useState<MockEmail | null>(null);
+  const [replyBody, setReplyBody] = useState("");
+
+  function handleView(e: MockEmail) {
+    setOpenEmail(e);
+    setReplyBody(e.draftPreview ?? "");
+  }
+
 
   const emailEventMap = useEventsStore((s) => s.emailEventMap);
   const events = useEventsStore((s) => s.events);
