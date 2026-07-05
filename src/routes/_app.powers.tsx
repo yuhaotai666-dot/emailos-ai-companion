@@ -1,6 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { useHealth, useSpecialists } from "@/lib/api/queries";
+import {
+  useHealth,
+  useRoutines,
+  useRunRoutineNow,
+  useSpecialists,
+  useToggleRoutine,
+} from "@/lib/api/queries";
+import { Switch } from "@/components/ui/switch";
 import {
   Inbox,
   CalendarClock,
@@ -221,9 +228,12 @@ function RoutinesTab() {
         </div>
       </div>
 
+      <LiveRoutines />
+
+      <h2 className="text-sm font-medium text-foreground mb-4">Ideas from the catalog</h2>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-10">
         {myRoutines.map((r) => (
-          <RoutineTile key={r.id} routine={r} />
+          <RoutineTile key={r.id} routine={r} suggested />
         ))}
       </div>
 
@@ -233,6 +243,58 @@ function RoutinesTab() {
           <RoutineTile key={r.id} routine={r} suggested />
         ))}
       </div>
+    </div>
+  );
+}
+
+function LiveRoutines() {
+  // Real scheduled routines from the backend (Ivy runs these automatically).
+  const { data: routines = [] } = useRoutines();
+  const toggle = useToggleRoutine();
+  const runNow = useRunRoutineNow();
+
+  if (routines.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-border bg-cream/40 px-6 py-8 text-center mb-10">
+        <p className="text-sm text-muted-foreground">
+          No routines yet. Ask Ivy on Home — e.g. "Every day at 8:30 tell me what needs my attention."
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-10">
+      {routines.map((r) => (
+        <div
+          key={r.id}
+          className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)] flex flex-col"
+        >
+          <div className="flex items-start justify-between mb-2">
+            <span className="h-10 w-10 rounded-xl flex items-center justify-center bg-amber-100 text-amber-700">
+              <Sun className="h-5 w-5" />
+            </span>
+            <Switch
+              checked={r.enabled}
+              onCheckedChange={(v) => toggle.mutate({ id: r.id, enabled: v })}
+              aria-label="Toggle routine"
+            />
+          </div>
+          <h3 className="font-medium text-foreground">{r.title}</h3>
+          <p className="text-[11px] text-muted-foreground mt-0.5 capitalize">
+            {r.schedule} · {r.time}
+            {r.last_run_at ? " · last ran recently" : " · not run yet"}
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground flex-1">{r.prompt}</p>
+          <button
+            onClick={() => runNow.mutate(r.id)}
+            disabled={runNow.isPending}
+            className="mt-4 w-full rounded-lg border border-border text-sm py-2 hover:bg-sidebar-accent transition disabled:opacity-50"
+          >
+            {runNow.isPending ? "Running…" : "Run now"}
+          </button>
+        </div>
+      ))}
     </div>
   );
 }

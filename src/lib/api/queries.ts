@@ -203,6 +203,72 @@ export function useRunTriage() {
   });
 }
 
+// ---- routines (proactive schedules) & nudges ----
+export interface Routine {
+  id: string;
+  title: string;
+  prompt: string;
+  schedule: string;
+  time: string;
+  enabled: boolean;
+  kind: string;
+  created_from: string;
+  last_run_at?: string | null;
+}
+
+export interface Nudge {
+  id: string;
+  routine_id: string;
+  title: string;
+  body: string;
+  items: string[];
+  created_at: string;
+  read: boolean;
+}
+
+export function useRoutines() {
+  return useQuery<Routine[]>({
+    queryKey: ["routines"],
+    queryFn: () => withFallback(() => req<Routine[]>("/api/routines"), []),
+  });
+}
+
+export function useCreateRoutine() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (r: { title: string; prompt: string; time?: string; schedule?: string }) =>
+      req<Routine>("/api/routines", { method: "POST", body: JSON.stringify(r) }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ["routines"] }),
+  });
+}
+
+export function useToggleRoutine() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, enabled }: { id: string; enabled: boolean }) =>
+      req<Routine>(`/api/routines/${id}`, { method: "PATCH", body: JSON.stringify({ enabled }) }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ["routines"] }),
+  });
+}
+
+export function useRunRoutineNow() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => req<Nudge>(`/api/routines/${id}/run`, { method: "POST" }),
+    onSuccess: () => {
+      toast.success("Routine ran — result is on your Home page");
+      void qc.invalidateQueries();
+    },
+  });
+}
+
+export function useNudges() {
+  return useQuery<Nudge[]>({
+    queryKey: ["nudges"],
+    queryFn: () => withFallback(() => req<Nudge[]>("/api/nudges?unread_only=true"), []),
+  });
+}
+
 // ---- backend health (integrations status) ----
 export interface HealthInfo {
   status: string;

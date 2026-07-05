@@ -4,8 +4,10 @@ import { useMemo, useState } from "react";
 import { taskExamples } from "@/lib/mock-data";
 import {
   useBrief,
+  useCreateRoutine,
   useIvyChat,
   useMeetings,
+  useNudges,
   useSpecialists,
   useUserName,
   type ChatEvent,
@@ -70,6 +72,8 @@ function HomePage() {
   const { data: brief } = useBrief();
   const { data: meetings = [] } = useMeetings();
   const { data: specialists = [] } = useSpecialists();
+  const { data: nudges = [] } = useNudges();
+  const createRoutine = useCreateRoutine();
   const ivy = useIvyChat();
 
   const [thread, setThread] = useState<ChatTurn[]>([]);
@@ -84,10 +88,23 @@ function HomePage() {
     if (!value) return;
     const sched = detectSchedule(value);
     if (sched) {
-      const t = addTask({ prompt: value, schedule: sched.schedule, time: sched.time });
-      toast.success("Scheduled task created", {
-        description: `${describeSchedule(t)} — Ivy will run this automatically.`,
-      });
+      // Persist to the backend so the scheduler actually runs it; fall back
+      // to the local store when the backend is offline.
+      createRoutine.mutate(
+        { title: value.slice(0, 60), prompt: value, time: sched.time, schedule: sched.schedule },
+        {
+          onSuccess: () =>
+            toast.success("Routine created", {
+              description: "Ivy will run this automatically — see Powers → Routines.",
+            }),
+          onError: () => {
+            const t = addTask({ prompt: value, schedule: sched.schedule, time: sched.time });
+            toast.success("Scheduled task saved locally", {
+              description: `${describeSchedule(t)} — connect the backend to run it for real.`,
+            });
+          },
+        },
+      );
       setInput("");
       return;
     }
@@ -263,6 +280,20 @@ function HomePage() {
               <h3 className="text-sm font-medium text-foreground">Need to know</h3>
             </div>
             <ul className="grid gap-3">
+              {nudges.slice(0, 2).map((n) => (
+                <li key={n.id} className="border-b border-border last:border-0 pb-3 last:pb-0">
+                  <div className="flex items-center gap-1.5">
+                    <Sparkles className="h-3 w-3 text-accent shrink-0" />
+                    <p className="text-xs font-medium text-foreground">{n.title}</p>
+                  </div>
+                  <p className="mt-1 text-sm text-foreground leading-snug">{n.body}</p>
+                  {n.items.slice(0, 3).map((item, i) => (
+                    <p key={i} className="mt-1 text-xs text-muted-foreground leading-snug">
+                      · {item}
+                    </p>
+                  ))}
+                </li>
+              ))}
               {(brief?.needToKnow ?? []).map((n) => (
                 <li key={n.id} className="border-b border-border last:border-0 pb-3 last:pb-0">
                   <p className="text-sm text-foreground leading-snug">{n.text}</p>
