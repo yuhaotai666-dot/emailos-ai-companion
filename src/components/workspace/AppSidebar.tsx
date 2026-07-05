@@ -11,6 +11,7 @@ import {
   Search,
   Plus,
   Sparkles,
+  Zap,
 } from "lucide-react";
 import { mockAssistant, mockUser } from "@/lib/mock-data";
 
@@ -20,6 +21,7 @@ const items = [
   { title: "Calendar", url: "/calendar", icon: CalendarDays },
   { title: "To-do", url: "/todo", icon: ListChecks },
   { title: "Meetings", url: "/meetings", icon: Calendar },
+  { title: "Powers", url: "/powers", icon: Zap },
   { title: "People", url: "/people", icon: Users },
   { title: "Memory", url: "/memory", icon: Brain },
   { title: "Settings", url: "/settings", icon: Settings },

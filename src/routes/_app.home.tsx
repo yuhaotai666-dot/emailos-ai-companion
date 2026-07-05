@@ -110,11 +110,8 @@ function HomePage() {
       <div className="grid lg:grid-cols-[1fr_320px] gap-8">
         {/* Main column */}
         <div>
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
+          <div className="text-xs text-muted-foreground">
             <span>{today}</span>
-            <Link to="/meetings" className="hover:text-foreground transition-colors">
-              View schedule →
-            </Link>
           </div>
 
           <h1 className="mt-3 font-serif text-4xl sm:text-5xl text-foreground leading-tight">
