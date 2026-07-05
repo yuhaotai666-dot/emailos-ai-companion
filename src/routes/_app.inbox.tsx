@@ -43,7 +43,15 @@ function InboxPage() {
   }
 
   function handleMarkDone(emailId: string) {
-    setMarkedDoneIds((prev) => new Set(prev).add(emailId));
+    setMarkedDoneIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(emailId)) {
+        next.delete(emailId);
+      } else {
+        next.add(emailId);
+      }
+      return next;
+    });
   }
 
   function handleRefresh() {
