@@ -23,6 +23,8 @@ export interface MockEmail {
   draftPreview?: string;
   confidence?: number;
   filter?: string;
+  /** Real snippet of the email body (present when data comes from the backend). */
+  bodyPreview?: string;
 }
 
 export const mockUser = {

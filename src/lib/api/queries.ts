@@ -203,6 +203,22 @@ export function useRunTriage() {
   });
 }
 
+// ---- backend health (integrations status) ----
+export interface HealthInfo {
+  status: string;
+  llm_mode: string;
+  llm_model?: string | null;
+  email_provider: string;
+  auto_send_enabled: boolean;
+}
+
+export function useHealth() {
+  return useQuery<HealthInfo | null>({
+    queryKey: ["health"],
+    queryFn: () => withFallback(() => req<HealthInfo>("/api/health"), null),
+  });
+}
+
 // ---- Ivy's specialist team ----
 export interface Specialist {
   id: string;
@@ -212,6 +228,8 @@ export interface Specialist {
   runs: number;
   created_at: string;
   last_used_at?: string | null;
+  /** "system" for the built-in email/meeting/reminder agents, "custom" for user-created. */
+  kind?: string;
 }
 
 export function useSpecialists() {

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { mockEmails } from "@/lib/mock-data";
+import { useEmails } from "@/lib/api/queries";
 import { PageHeader } from "@/components/workspace/Common";
 import { PriorityBadge, CategoryBadge } from "@/components/workspace/Badges";
 import { Button } from "@/components/ui/button";
@@ -19,8 +19,9 @@ export const Route = createFileRoute("/_app/inbox/finished")({
 function FinishedPage() {
   const finished = useFinishedEmailsStore((s) => s.finished);
   const remove = useFinishedEmailsStore((s) => s.remove);
+  const { data: emails = [] } = useEmails();
 
-  const items = mockEmails
+  const items = emails
     .filter((e) => finished[e.id])
     .map((e) => ({ email: e, kind: finished[e.id] }));
 

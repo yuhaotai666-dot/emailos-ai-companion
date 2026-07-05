@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useHealth, useSpecialists } from "@/lib/api/queries";
 import {
   Inbox,
   CalendarClock,
@@ -362,11 +363,10 @@ function SkillsTab() {
       />
 
       <h2 className="text-sm font-medium text-foreground mb-4">My skills</h2>
-      <div className="rounded-2xl border border-dashed border-border bg-cream/40 px-6 py-12 text-center mb-10">
-        <p className="text-sm text-muted-foreground">
-          No skills yet. Describe a task to Ivy and she'll spin up a subagent — publish it when it's ready.
-        </p>
-      </div>
+      <MySkills />
+
+      <h2 className="text-sm font-medium text-foreground mb-4">Ivy's core team</h2>
+      <SystemTeam />
 
       <div className="flex items-center justify-between mb-4">
         <div>
@@ -415,6 +415,97 @@ function SkillsTab() {
 }
 
 
+const SKILL_TONES = [
+  "bg-blue-100 text-blue-700",
+  "bg-emerald-100 text-emerald-700",
+  "bg-purple-100 text-purple-700",
+  "bg-amber-100 text-amber-700",
+  "bg-rose-100 text-rose-700",
+  "bg-sky-100 text-sky-700",
+];
+
+function MySkills() {
+  // Custom specialists Ivy spawned from user requests (kind !== system).
+  const { data: specialists = [] } = useSpecialists();
+  const mine = specialists.filter((s) => s.kind !== "system");
+
+  if (mine.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-border bg-cream/40 px-6 py-12 text-center mb-10">
+        <p className="text-sm text-muted-foreground">
+          No skills yet. Describe a task to Ivy and she'll spin up a subagent — publish it when it's ready.
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 mb-10">
+      {mine.map((s, i) => (
+        <div
+          key={s.id}
+          className="rounded-2xl border border-border bg-card p-4 flex flex-col shadow-[var(--shadow-soft)]"
+        >
+          <div className="flex items-start justify-between mb-2">
+            <span
+              className={
+                "h-10 w-10 rounded-xl flex items-center justify-center font-medium " +
+                SKILL_TONES[i % SKILL_TONES.length]
+              }
+            >
+              {s.name.charAt(0).toUpperCase()}
+            </span>
+            <span className="text-[11px] text-muted-foreground">used {s.runs}x</span>
+          </div>
+          <h3 className="font-medium text-foreground text-sm">{s.name}</h3>
+          <p className="mt-2 text-xs text-muted-foreground flex-1">{s.description}</p>
+          <div className="mt-3 flex flex-wrap gap-1">
+            {s.tools.map((t) => (
+              <span
+                key={t}
+                className="rounded-full border border-border/70 bg-background px-1.5 py-0.5 text-[10px] text-muted-foreground"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SystemTeam() {
+  // The built-in domain agents (email / meeting / reminder).
+  const { data: specialists = [] } = useSpecialists();
+  const system = specialists.filter((s) => s.kind === "system");
+
+  if (system.length === 0) {
+    return (
+      <p className="text-xs text-muted-foreground mb-10">
+        Ivy's built-in email / meeting / reminder agents appear here once the backend is running.
+      </p>
+    );
+  }
+  return (
+    <div className="grid gap-3 sm:grid-cols-3 mb-10">
+      {system.map((s) => (
+        <div
+          key={s.id}
+          className="rounded-2xl border border-border bg-cream/50 p-4 shadow-[var(--shadow-soft)]"
+        >
+          <div className="flex items-center justify-between">
+            <h3 className="font-medium text-foreground text-sm">{s.name}</h3>
+            <span className="text-[10px] rounded-full border border-border bg-background px-2 py-0.5 text-muted-foreground">
+              built-in
+            </span>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">{s.description}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 interface Integration {
   id: string;
   name: string;
@@ -425,7 +516,6 @@ interface Integration {
 }
 
 const integrations: Integration[] = [
-  { id: "google", name: "Google", description: "1 account connected", letter: "G", tone: "bg-red-100 text-red-700", connected: true },
   { id: "airtable", name: "Airtable", description: "Read and write records", letter: "A", tone: "bg-yellow-100 text-yellow-700" },
   { id: "asana", name: "Asana", description: "Manage tasks and projects", letter: "A", tone: "bg-rose-100 text-rose-700" },
   { id: "ashby", name: "Ashby", description: "Candidates and jobs", letter: "A", tone: "bg-neutral-200 text-neutral-800" },
@@ -454,14 +544,31 @@ const integrations: Integration[] = [
 function IntegrationsTab() {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<"all" | "connected">("all");
+  const { data: health } = useHealth();
 
-  const filtered = integrations.filter((i) => {
+  // Gmail status comes from the live backend; the rest is the catalog.
+  const gmailConnected = health?.email_provider === "gmail";
+  const all: Integration[] = [
+    {
+      id: "google",
+      name: "Google (Gmail)",
+      description: gmailConnected
+        ? `Connected — read-only${health?.llm_model ? ` · drafts by ${health.llm_model}` : ""}`
+        : "Not connected — run gmail_auth in the backend",
+      letter: "G",
+      tone: "bg-red-100 text-red-700",
+      connected: gmailConnected,
+    },
+    ...integrations,
+  ];
+
+  const filtered = all.filter((i) => {
     if (filter === "connected" && !i.connected) return false;
     if (query && !i.name.toLowerCase().includes(query.toLowerCase())) return false;
     return true;
   });
 
-  const connectedCount = integrations.filter((i) => i.connected).length;
+  const connectedCount = all.filter((i) => i.connected).length;
 
   return (
     <div>
@@ -496,7 +603,7 @@ function IntegrationsTab() {
               : "border-transparent text-muted-foreground hover:text-foreground")
           }
         >
-          All · {integrations.length}
+          All · {all.length}
         </button>
         <button
           onClick={() => setFilter("connected")}

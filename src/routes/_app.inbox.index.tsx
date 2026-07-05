@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { mockEmails, type MockEmail } from "@/lib/mock-data";
+import { type MockEmail } from "@/lib/mock-data";
+import { useEmails, useRunTriage } from "@/lib/api/queries";
 import { PageHeader } from "@/components/workspace/Common";
 import { PriorityBadge, CategoryBadge } from "@/components/workspace/Badges";
 import { Button } from "@/components/ui/button";
@@ -62,7 +63,10 @@ function InboxPage() {
   const emailEventMap = useEventsStore((s) => s.emailEventMap);
   const events = useEventsStore((s) => s.events);
 
-  const visibleEmails = mockEmails.filter((e) => !finished[e.id]);
+  const { data: emails = [], isLoading } = useEmails();
+  const runTriage = useRunTriage();
+
+  const visibleEmails = emails.filter((e) => !finished[e.id]);
 
   const priorityFiltered = visibleEmails;
 
@@ -95,6 +99,17 @@ function InboxPage() {
           onManage={() => setManageOpen(true)}
         />
         <div className="flex items-center gap-2 ml-4 shrink-0">
+          <Button
+            size="sm"
+            className="rounded-full h-8 text-xs bg-foreground text-background hover:opacity-90"
+            disabled={runTriage.isPending}
+            onClick={() => runTriage.mutate()}
+          >
+            <RefreshCw
+              className={"h-3.5 w-3.5 mr-1" + (runTriage.isPending ? " animate-spin" : "")}
+            />
+            {runTriage.isPending ? "Running…" : "Run triage"}
+          </Button>
           <Button
             variant="outline"
             size="sm"
@@ -181,7 +196,7 @@ function InboxPage() {
         {filtered.length === 0 && (
           <div className="rounded-2xl border border-dashed border-border bg-card/50 p-10 text-center">
             <p className="text-sm text-muted-foreground">
-              No emails match this filter combination.
+              {isLoading ? "Loading your inbox…" : "No emails match this filter combination."}
             </p>
           </div>
         )}
@@ -219,9 +234,9 @@ function InboxPage() {
                     Full message
                   </p>
                   <div className="rounded-2xl border border-border bg-cream/40 px-4 py-4 text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
-                    {`Hi Theo,\n\n${openEmail.summary}\n\n${
-                      openEmail.reason
-                    }\n\nBest,\n${openEmail.sender}`}
+                    {openEmail.bodyPreview
+                      ? `${openEmail.bodyPreview}\n\n— ${openEmail.sender}`
+                      : `Hi Theo,\n\n${openEmail.summary}\n\n${openEmail.reason}\n\nBest,\n${openEmail.sender}`}
                   </div>
                 </div>
 

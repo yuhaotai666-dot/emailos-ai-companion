@@ -56,6 +56,7 @@ export function toMockEmail(e: EmailView): MockEmail {
     draftPreview: e.draft_preview ?? undefined,
     confidence: e.confidence != null ? Math.round(e.confidence * 100) : undefined,
     filter: e.category ?? undefined,
+    bodyPreview: e.body_preview || undefined,
   };
 }
 
