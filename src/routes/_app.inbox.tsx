@@ -1,13 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { mockEmails } from "@/lib/mock-data";
+import { mockEmails, type MockEmail } from "@/lib/mock-data";
 import { PageHeader } from "@/components/workspace/Common";
 import { PriorityBadge, CategoryBadge } from "@/components/workspace/Badges";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useEventsStore } from "@/lib/events-store";
 import { EventFilterBar } from "@/components/workspace/EventFilterBar";
 import { EventLabelPicker } from "@/components/workspace/EventLabelPicker";
 import { ManageEventsDialog } from "@/components/workspace/ManageEventsDialog";
+import { Send, X } from "lucide-react";
+
 
 export const Route = createFileRoute("/_app/inbox")({
   head: () => ({
