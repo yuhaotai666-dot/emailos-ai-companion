@@ -161,12 +161,12 @@ function InboxPage() {
                   View
                 </Button>
                 <Button
-                  variant={finished[e.id] === "done" ? "default" : "outline"}
+                  variant={markedDoneIds.has(e.id) ? "default" : "outline"}
                   size="sm"
                   className="rounded-full h-8 text-xs"
                   onClick={() => handleMarkDone(e.id)}
                 >
-                  {finished[e.id] === "done" ? "Marked" : "Mark Done"}
+                  {markedDoneIds.has(e.id) ? "Marked" : "Mark Done"}
                 </Button>
                 <EventLabelPicker emailId={e.id} onManage={() => setManageOpen(true)} />
                 {ev && (
