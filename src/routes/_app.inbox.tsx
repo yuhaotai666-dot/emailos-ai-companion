@@ -92,6 +92,15 @@ function InboxPage() {
           totalCount={priorityFiltered.length}
           onManage={() => setManageOpen(true)}
         />
+        <Button
+          variant="outline"
+          size="sm"
+          className="rounded-full h-8 text-xs ml-4 shrink-0"
+          onClick={handleRefresh}
+        >
+          <RefreshCw className="h-3.5 w-3.5 mr-1" />
+          Refresh
+        </Button>
       </div>
 
 
