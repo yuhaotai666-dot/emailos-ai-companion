@@ -109,12 +109,22 @@ function InboxPage() {
               </div>
 
               <div className="mt-4 flex flex-wrap items-center gap-2">
-                <Button variant="outline" size="sm" className="rounded-full h-8 text-xs bg-background">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full h-8 text-xs bg-background"
+                  onClick={() => handleView(e)}
+                >
                   View
                 </Button>
-                <Button size="sm" className="rounded-full h-8 text-xs bg-foreground text-background hover:opacity-90">
+                <Button
+                  size="sm"
+                  className="rounded-full h-8 text-xs bg-foreground text-background hover:opacity-90"
+                  onClick={() => handleView(e)}
+                >
                   Draft Reply
                 </Button>
+
                 <Button variant="ghost" size="sm" className="rounded-full h-8 text-xs">
                   Mark Done
                 </Button>
