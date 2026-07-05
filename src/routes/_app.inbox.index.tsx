@@ -14,7 +14,7 @@ import { useFinishedEmailsStore } from "@/lib/finished-emails-store";
 import { Send, X, RefreshCw, CheckCircle2 } from "lucide-react";
 
 
-export const Route = createFileRoute("/_app/inbox")({
+export const Route = createFileRoute("/_app/inbox/")({
   head: () => ({
     meta: [
       { title: "Email — Ivy" },

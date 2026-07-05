@@ -23,9 +23,9 @@ import { Route as AppPowersRouteImport } from './routes/_app.powers'
 import { Route as AppPeopleRouteImport } from './routes/_app.people'
 import { Route as AppMemoryRouteImport } from './routes/_app.memory'
 import { Route as AppMeetingsRouteImport } from './routes/_app.meetings'
-import { Route as AppInboxRouteImport } from './routes/_app.inbox'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppCalendarRouteImport } from './routes/_app.calendar'
+import { Route as AppInboxIndexRouteImport } from './routes/_app.inbox.index'
 import { Route as AppPeoplePersonIdRouteImport } from './routes/_app.people.$personId'
 import { Route as AppInboxFinishedRouteImport } from './routes/_app.inbox.finished'
 
@@ -98,11 +98,6 @@ const AppMeetingsRoute = AppMeetingsRouteImport.update({
   path: '/meetings',
   getParentRoute: () => AppRoute,
 } as any)
-const AppInboxRoute = AppInboxRouteImport.update({
-  id: '/inbox',
-  path: '/inbox',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppHomeRoute = AppHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -113,15 +108,20 @@ const AppCalendarRoute = AppCalendarRouteImport.update({
   path: '/calendar',
   getParentRoute: () => AppRoute,
 } as any)
+const AppInboxIndexRoute = AppInboxIndexRouteImport.update({
+  id: '/inbox/',
+  path: '/inbox/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPeoplePersonIdRoute = AppPeoplePersonIdRouteImport.update({
   id: '/$personId',
   path: '/$personId',
   getParentRoute: () => AppPeopleRoute,
 } as any)
 const AppInboxFinishedRoute = AppInboxFinishedRouteImport.update({
-  id: '/finished',
-  path: '/finished',
-  getParentRoute: () => AppInboxRoute,
+  id: '/inbox/finished',
+  path: '/inbox/finished',
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -129,7 +129,6 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRouteWithChildren
   '/calendar': typeof AppCalendarRoute
   '/home': typeof AppHomeRoute
-  '/inbox': typeof AppInboxRouteWithChildren
   '/meetings': typeof AppMeetingsRoute
   '/memory': typeof AppMemoryRoute
   '/people': typeof AppPeopleRouteWithChildren
@@ -143,12 +142,12 @@ export interface FileRoutesByFullPath {
   '/onboarding/': typeof OnboardingIndexRoute
   '/inbox/finished': typeof AppInboxFinishedRoute
   '/people/$personId': typeof AppPeoplePersonIdRoute
+  '/inbox/': typeof AppInboxIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/calendar': typeof AppCalendarRoute
   '/home': typeof AppHomeRoute
-  '/inbox': typeof AppInboxRouteWithChildren
   '/meetings': typeof AppMeetingsRoute
   '/memory': typeof AppMemoryRoute
   '/people': typeof AppPeopleRouteWithChildren
@@ -162,6 +161,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingIndexRoute
   '/inbox/finished': typeof AppInboxFinishedRoute
   '/people/$personId': typeof AppPeoplePersonIdRoute
+  '/inbox': typeof AppInboxIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -170,7 +170,6 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRouteWithChildren
   '/_app/calendar': typeof AppCalendarRoute
   '/_app/home': typeof AppHomeRoute
-  '/_app/inbox': typeof AppInboxRouteWithChildren
   '/_app/meetings': typeof AppMeetingsRoute
   '/_app/memory': typeof AppMemoryRoute
   '/_app/people': typeof AppPeopleRouteWithChildren
@@ -184,6 +183,7 @@ export interface FileRoutesById {
   '/onboarding/': typeof OnboardingIndexRoute
   '/_app/inbox/finished': typeof AppInboxFinishedRoute
   '/_app/people/$personId': typeof AppPeoplePersonIdRoute
+  '/_app/inbox/': typeof AppInboxIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -192,7 +192,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/calendar'
     | '/home'
-    | '/inbox'
     | '/meetings'
     | '/memory'
     | '/people'
@@ -206,12 +205,12 @@ export interface FileRouteTypes {
     | '/onboarding/'
     | '/inbox/finished'
     | '/people/$personId'
+    | '/inbox/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/calendar'
     | '/home'
-    | '/inbox'
     | '/meetings'
     | '/memory'
     | '/people'
@@ -225,6 +224,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/inbox/finished'
     | '/people/$personId'
+    | '/inbox'
   id:
     | '__root__'
     | '/'
@@ -232,7 +232,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/_app/calendar'
     | '/_app/home'
-    | '/_app/inbox'
     | '/_app/meetings'
     | '/_app/memory'
     | '/_app/people'
@@ -246,6 +245,7 @@ export interface FileRouteTypes {
     | '/onboarding/'
     | '/_app/inbox/finished'
     | '/_app/people/$personId'
+    | '/_app/inbox/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -354,13 +354,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMeetingsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/inbox': {
-      id: '/_app/inbox'
-      path: '/inbox'
-      fullPath: '/inbox'
-      preLoaderRoute: typeof AppInboxRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/home': {
       id: '/_app/home'
       path: '/home'
@@ -375,6 +368,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCalendarRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/inbox/': {
+      id: '/_app/inbox/'
+      path: '/inbox'
+      fullPath: '/inbox/'
+      preLoaderRoute: typeof AppInboxIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/people/$personId': {
       id: '/_app/people/$personId'
       path: '/$personId'
@@ -384,25 +384,13 @@ declare module '@tanstack/react-router' {
     }
     '/_app/inbox/finished': {
       id: '/_app/inbox/finished'
-      path: '/finished'
+      path: '/inbox/finished'
       fullPath: '/inbox/finished'
       preLoaderRoute: typeof AppInboxFinishedRouteImport
-      parentRoute: typeof AppInboxRoute
+      parentRoute: typeof AppRoute
     }
   }
 }
-
-interface AppInboxRouteChildren {
-  AppInboxFinishedRoute: typeof AppInboxFinishedRoute
-}
-
-const AppInboxRouteChildren: AppInboxRouteChildren = {
-  AppInboxFinishedRoute: AppInboxFinishedRoute,
-}
-
-const AppInboxRouteWithChildren = AppInboxRoute._addFileChildren(
-  AppInboxRouteChildren,
-)
 
 interface AppPeopleRouteChildren {
   AppPeoplePersonIdRoute: typeof AppPeoplePersonIdRoute
@@ -419,25 +407,27 @@ const AppPeopleRouteWithChildren = AppPeopleRoute._addFileChildren(
 interface AppRouteChildren {
   AppCalendarRoute: typeof AppCalendarRoute
   AppHomeRoute: typeof AppHomeRoute
-  AppInboxRoute: typeof AppInboxRouteWithChildren
   AppMeetingsRoute: typeof AppMeetingsRoute
   AppMemoryRoute: typeof AppMemoryRoute
   AppPeopleRoute: typeof AppPeopleRouteWithChildren
   AppPowersRoute: typeof AppPowersRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppTodoRoute: typeof AppTodoRoute
+  AppInboxFinishedRoute: typeof AppInboxFinishedRoute
+  AppInboxIndexRoute: typeof AppInboxIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppCalendarRoute: AppCalendarRoute,
   AppHomeRoute: AppHomeRoute,
-  AppInboxRoute: AppInboxRouteWithChildren,
   AppMeetingsRoute: AppMeetingsRoute,
   AppMemoryRoute: AppMemoryRoute,
   AppPeopleRoute: AppPeopleRouteWithChildren,
   AppPowersRoute: AppPowersRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppTodoRoute: AppTodoRoute,
+  AppInboxFinishedRoute: AppInboxFinishedRoute,
+  AppInboxIndexRoute: AppInboxIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
