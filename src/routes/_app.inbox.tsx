@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { mockEmails, type MockEmail } from "@/lib/mock-data";
 import { PageHeader } from "@/components/workspace/Common";
@@ -10,7 +10,8 @@ import { useEventsStore } from "@/lib/events-store";
 import { EventFilterBar } from "@/components/workspace/EventFilterBar";
 import { EventLabelPicker } from "@/components/workspace/EventLabelPicker";
 import { ManageEventsDialog } from "@/components/workspace/ManageEventsDialog";
-import { Send, X, RefreshCw } from "lucide-react";
+import { useFinishedEmailsStore } from "@/lib/finished-emails-store";
+import { Send, X, RefreshCw, CheckCircle2 } from "lucide-react";
 
 
 export const Route = createFileRoute("/_app/inbox")({
@@ -28,9 +29,12 @@ function InboxPage() {
   const [manageOpen, setManageOpen] = useState(false);
   const [openEmail, setOpenEmail] = useState<MockEmail | null>(null);
   const [replyBody, setReplyBody] = useState("");
-  const [sentReplyIds, setSentReplyIds] = useState<Set<string>>(new Set());
-  const [markedDoneIds, setMarkedDoneIds] = useState<Set<string>>(new Set());
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
+
+  const finished = useFinishedEmailsStore((s) => s.finished);
+  const markSent = useFinishedEmailsStore((s) => s.markSent);
+  const markDone = useFinishedEmailsStore((s) => s.markDone);
+  const unmarkDone = useFinishedEmailsStore((s) => s.unmarkDone);
 
   function handleView(e: MockEmail) {
     setOpenEmail(e);
@@ -38,36 +42,33 @@ function InboxPage() {
   }
 
   function handleSendReply(emailId: string) {
-    setSentReplyIds((prev) => new Set(prev).add(emailId));
+    markSent(emailId);
     setOpenEmail(null);
   }
 
   function handleMarkDone(emailId: string) {
-    setMarkedDoneIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(emailId)) {
-        next.delete(emailId);
-      } else {
-        next.add(emailId);
-      }
-      return next;
-    });
+    if (finished[emailId] === "done") {
+      unmarkDone(emailId);
+    } else {
+      markDone(emailId);
+    }
   }
 
   function handleRefresh() {
     setHiddenIds((prev) => {
       const next = new Set(prev);
-      for (const id of markedDoneIds) next.add(id);
+      for (const [id, kind] of Object.entries(finished)) {
+        if (kind === "done") next.add(id);
+      }
       return next;
     });
-    setMarkedDoneIds(new Set());
   }
 
   const emailEventMap = useEventsStore((s) => s.emailEventMap);
   const events = useEventsStore((s) => s.events);
 
   const visibleEmails = mockEmails.filter(
-    (e) => !sentReplyIds.has(e.id) && !hiddenIds.has(e.id),
+    (e) => finished[e.id] !== "sent" && !hiddenIds.has(e.id),
   );
 
   const priorityFiltered = visibleEmails;
