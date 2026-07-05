@@ -250,5 +250,3 @@ function InboxPage() {
     </div>
   );
 }
-
-}
