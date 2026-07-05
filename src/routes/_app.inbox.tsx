@@ -101,15 +101,23 @@ function InboxPage() {
           totalCount={priorityFiltered.length}
           onManage={() => setManageOpen(true)}
         />
-        <Button
-          variant="outline"
-          size="sm"
-          className="rounded-full h-8 text-xs ml-4 shrink-0"
-          onClick={handleRefresh}
-        >
-          <RefreshCw className="h-3.5 w-3.5 mr-1" />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2 ml-4 shrink-0">
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-full h-8 text-xs"
+            onClick={handleRefresh}
+          >
+            <RefreshCw className="h-3.5 w-3.5 mr-1" />
+            Refresh
+          </Button>
+          <Button asChild variant="outline" size="sm" className="rounded-full h-8 text-xs">
+            <Link to="/inbox/finished">
+              <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
+              Task finished
+            </Link>
+          </Button>
+        </div>
       </div>
 
 
@@ -160,12 +168,12 @@ function InboxPage() {
                   View
                 </Button>
                 <Button
-                  variant={markedDoneIds.has(e.id) ? "default" : "outline"}
+                  variant={finished[e.id] === "done" ? "default" : "outline"}
                   size="sm"
                   className="rounded-full h-8 text-xs"
                   onClick={() => handleMarkDone(e.id)}
                 >
-                  {markedDoneIds.has(e.id) ? "Marked" : "Mark Done"}
+                  {finished[e.id] === "done" ? "Marked" : "Mark Done"}
                 </Button>
                 <EventLabelPicker emailId={e.id} onManage={() => setManageOpen(true)} />
                 {ev && (
