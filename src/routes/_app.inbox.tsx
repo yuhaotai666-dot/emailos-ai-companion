@@ -159,7 +159,7 @@ function InboxPage() {
                   View
                 </Button>
                 <Button
-                  variant="ghost"
+                  variant={markedDoneIds.has(e.id) ? "default" : "outline"}
                   size="sm"
                   className="rounded-full h-8 text-xs"
                   onClick={() => handleMarkDone(e.id)}
