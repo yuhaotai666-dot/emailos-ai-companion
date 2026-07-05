@@ -177,22 +177,6 @@ function InboxPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-xl bg-cream/60 border border-border/60 px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                      Suggested action
-                    </p>
-                    <p className="text-xs text-foreground mt-0.5">
-                      {openEmail.suggestedAction}
-                    </p>
-                  </div>
-                  <div className="rounded-xl bg-cream/60 border border-border/60 px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                      Why this matters
-                    </p>
-                    <p className="text-xs text-foreground mt-0.5">{openEmail.reason}</p>
-                  </div>
-                </div>
               </div>
 
               <div className="border-t border-border bg-cream/30 px-6 py-4 space-y-3">
