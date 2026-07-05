@@ -29,12 +29,11 @@ function InboxPage() {
   const [manageOpen, setManageOpen] = useState(false);
   const [openEmail, setOpenEmail] = useState<MockEmail | null>(null);
   const [replyBody, setReplyBody] = useState("");
-  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
+  const [markedDoneIds, setMarkedDoneIds] = useState<Set<string>>(new Set());
 
   const finished = useFinishedEmailsStore((s) => s.finished);
   const markSent = useFinishedEmailsStore((s) => s.markSent);
   const markDone = useFinishedEmailsStore((s) => s.markDone);
-  const unmarkDone = useFinishedEmailsStore((s) => s.unmarkDone);
 
   function handleView(e: MockEmail) {
     setOpenEmail(e);
@@ -47,29 +46,23 @@ function InboxPage() {
   }
 
   function handleMarkDone(emailId: string) {
-    if (finished[emailId] === "done") {
-      unmarkDone(emailId);
-    } else {
-      markDone(emailId);
-    }
+    setMarkedDoneIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(emailId)) next.delete(emailId);
+      else next.add(emailId);
+      return next;
+    });
   }
 
   function handleRefresh() {
-    setHiddenIds((prev) => {
-      const next = new Set(prev);
-      for (const [id, kind] of Object.entries(finished)) {
-        if (kind === "done") next.add(id);
-      }
-      return next;
-    });
+    for (const id of markedDoneIds) markDone(id);
+    setMarkedDoneIds(new Set());
   }
 
   const emailEventMap = useEventsStore((s) => s.emailEventMap);
   const events = useEventsStore((s) => s.events);
 
-  const visibleEmails = mockEmails.filter(
-    (e) => finished[e.id] !== "sent" && !hiddenIds.has(e.id),
-  );
+  const visibleEmails = mockEmails.filter((e) => !finished[e.id]);
 
   const priorityFiltered = visibleEmails;
 
