@@ -144,7 +144,7 @@ function InboxPage() {
       <Sheet open={!!openEmail} onOpenChange={(o) => !o && setOpenEmail(null)}>
         <SheetContent
           side="right"
-          className="w-full sm:max-w-xl p-0 flex flex-col bg-background"
+          className="w-full sm:max-w-2xl p-0 flex flex-col bg-background"
         >
           {openEmail && (
             <>
