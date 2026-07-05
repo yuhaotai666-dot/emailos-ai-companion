@@ -28,17 +28,41 @@ function InboxPage() {
   const [manageOpen, setManageOpen] = useState(false);
   const [openEmail, setOpenEmail] = useState<MockEmail | null>(null);
   const [replyBody, setReplyBody] = useState("");
+  const [sentReplyIds, setSentReplyIds] = useState<Set<string>>(new Set());
+  const [markedDoneIds, setMarkedDoneIds] = useState<Set<string>>(new Set());
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
 
   function handleView(e: MockEmail) {
     setOpenEmail(e);
     setReplyBody(e.draftPreview ?? "");
   }
 
+  function handleSendReply(emailId: string) {
+    setSentReplyIds((prev) => new Set(prev).add(emailId));
+    setOpenEmail(null);
+  }
+
+  function handleMarkDone(emailId: string) {
+    setMarkedDoneIds((prev) => new Set(prev).add(emailId));
+  }
+
+  function handleRefresh() {
+    setHiddenIds((prev) => {
+      const next = new Set(prev);
+      for (const id of markedDoneIds) next.add(id);
+      return next;
+    });
+    setMarkedDoneIds(new Set());
+  }
 
   const emailEventMap = useEventsStore((s) => s.emailEventMap);
   const events = useEventsStore((s) => s.events);
 
-  const priorityFiltered = mockEmails;
+  const visibleEmails = mockEmails.filter(
+    (e) => !sentReplyIds.has(e.id) && !hiddenIds.has(e.id),
+  );
+
+  const priorityFiltered = visibleEmails;
 
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
