@@ -10,7 +10,7 @@ import { useEventsStore } from "@/lib/events-store";
 import { EventFilterBar } from "@/components/workspace/EventFilterBar";
 import { EventLabelPicker } from "@/components/workspace/EventLabelPicker";
 import { ManageEventsDialog } from "@/components/workspace/ManageEventsDialog";
-import { Send, X } from "lucide-react";
+import { Send, X, RefreshCw } from "lucide-react";
 
 
 export const Route = createFileRoute("/_app/inbox")({
@@ -28,17 +28,41 @@ function InboxPage() {
   const [manageOpen, setManageOpen] = useState(false);
   const [openEmail, setOpenEmail] = useState<MockEmail | null>(null);
   const [replyBody, setReplyBody] = useState("");
+  const [sentReplyIds, setSentReplyIds] = useState<Set<string>>(new Set());
+  const [markedDoneIds, setMarkedDoneIds] = useState<Set<string>>(new Set());
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
 
   function handleView(e: MockEmail) {
     setOpenEmail(e);
     setReplyBody(e.draftPreview ?? "");
   }
 
+  function handleSendReply(emailId: string) {
+    setSentReplyIds((prev) => new Set(prev).add(emailId));
+    setOpenEmail(null);
+  }
+
+  function handleMarkDone(emailId: string) {
+    setMarkedDoneIds((prev) => new Set(prev).add(emailId));
+  }
+
+  function handleRefresh() {
+    setHiddenIds((prev) => {
+      const next = new Set(prev);
+      for (const id of markedDoneIds) next.add(id);
+      return next;
+    });
+    setMarkedDoneIds(new Set());
+  }
 
   const emailEventMap = useEventsStore((s) => s.emailEventMap);
   const events = useEventsStore((s) => s.events);
 
-  const priorityFiltered = mockEmails;
+  const visibleEmails = mockEmails.filter(
+    (e) => !sentReplyIds.has(e.id) && !hiddenIds.has(e.id),
+  );
+
+  const priorityFiltered = visibleEmails;
 
   const counts = useMemo(() => {
     const c: Record<string, number> = {};
@@ -60,7 +84,7 @@ function InboxPage() {
         subtitle="Ivy separates what matters from what can wait."
       />
 
-      <div className="mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <EventFilterBar
           value={eventFilter}
           onChange={setEventFilter}
@@ -68,6 +92,15 @@ function InboxPage() {
           totalCount={priorityFiltered.length}
           onManage={() => setManageOpen(true)}
         />
+        <Button
+          variant="outline"
+          size="sm"
+          className="rounded-full h-8 text-xs ml-4 shrink-0"
+          onClick={handleRefresh}
+        >
+          <RefreshCw className="h-3.5 w-3.5 mr-1" />
+          Refresh
+        </Button>
       </div>
 
 
@@ -117,8 +150,13 @@ function InboxPage() {
                 >
                   View
                 </Button>
-                <Button variant="ghost" size="sm" className="rounded-full h-8 text-xs">
-                  Mark Done
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="rounded-full h-8 text-xs"
+                  onClick={() => handleMarkDone(e.id)}
+                >
+                  {markedDoneIds.has(e.id) ? "Marked" : "Mark Done"}
                 </Button>
                 <EventLabelPicker emailId={e.id} onManage={() => setManageOpen(true)} />
                 {ev && (
@@ -213,6 +251,7 @@ function InboxPage() {
                     size="sm"
                     className="rounded-full h-8 text-xs bg-foreground text-background hover:opacity-90"
                     disabled={!replyBody.trim()}
+                    onClick={() => openEmail && handleSendReply(openEmail.id)}
                   >
                     <Send className="h-3.5 w-3.5 mr-1" />
                     Send reply
