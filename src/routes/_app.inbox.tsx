@@ -117,14 +117,6 @@ function InboxPage() {
                 >
                   View
                 </Button>
-                <Button
-                  size="sm"
-                  className="rounded-full h-8 text-xs bg-foreground text-background hover:opacity-90"
-                  onClick={() => handleView(e)}
-                >
-                  Draft Reply
-                </Button>
-
                 <Button variant="ghost" size="sm" className="rounded-full h-8 text-xs">
                   Mark Done
                 </Button>
