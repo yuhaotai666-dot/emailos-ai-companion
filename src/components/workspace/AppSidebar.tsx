@@ -1,4 +1,5 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import {
   Home,
   Inbox,
@@ -12,8 +13,11 @@ import {
   Plus,
   Sparkles,
   Zap,
+  LogOut,
 } from "lucide-react";
-import { mockAssistant, mockUser } from "@/lib/mock-data";
+import { mockAssistant } from "@/lib/mock-data";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const items = [
   { title: "Home", url: "/home", icon: Home },
@@ -29,6 +33,27 @@ const items = [
 
 export function AppSidebar() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const navigate = useNavigate();
+  const [userInfo, setUserInfo] = useState<{ name: string; email: string } | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        const meta = (data.user.user_metadata ?? {}) as Record<string, string>;
+        setUserInfo({
+          name: meta.full_name || meta.name || data.user.email?.split("@")[0] || "You",
+          email: data.user.email ?? "",
+        });
+      }
+    });
+  }, []);
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    toast.success("Signed out");
+    navigate({ to: "/auth" });
+  }
+
 
   return (
     <aside className="hidden md:flex w-64 shrink-0 flex-col border-r border-border bg-sidebar h-screen sticky top-0">
@@ -88,12 +113,19 @@ export function AppSidebar() {
         </div>
         <div className="flex items-center gap-2 rounded-xl bg-background border border-border px-3 py-2">
           <span className="h-7 w-7 rounded-full bg-foreground text-background flex items-center justify-center text-[11px] font-medium">
-            {mockUser.name[0]}
+            {(userInfo?.name?.[0] ?? "?").toUpperCase()}
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium text-foreground truncate">{mockUser.fullName}</p>
-            <p className="text-[10px] text-muted-foreground truncate">{mockUser.plan}</p>
+            <p className="text-xs font-medium text-foreground truncate">{userInfo?.name ?? "Guest"}</p>
+            <p className="text-[10px] text-muted-foreground truncate">{userInfo?.email ?? ""}</p>
           </div>
+          <button
+            onClick={handleSignOut}
+            title="Sign out"
+            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+          </button>
         </div>
       </div>
     </aside>
