@@ -1,4 +1,5 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import {
   Home,
   Inbox,
@@ -12,8 +13,11 @@ import {
   Plus,
   Sparkles,
   Zap,
+  LogOut,
 } from "lucide-react";
-import { mockAssistant, mockUser } from "@/lib/mock-data";
+import { mockAssistant } from "@/lib/mock-data";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const items = [
   { title: "Home", url: "/home", icon: Home },
