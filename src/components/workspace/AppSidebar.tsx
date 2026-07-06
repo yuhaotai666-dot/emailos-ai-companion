@@ -113,12 +113,19 @@ export function AppSidebar() {
         </div>
         <div className="flex items-center gap-2 rounded-xl bg-background border border-border px-3 py-2">
           <span className="h-7 w-7 rounded-full bg-foreground text-background flex items-center justify-center text-[11px] font-medium">
-            {mockUser.name[0]}
+            {(userInfo?.name?.[0] ?? "?").toUpperCase()}
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium text-foreground truncate">{mockUser.fullName}</p>
-            <p className="text-[10px] text-muted-foreground truncate">{mockUser.plan}</p>
+            <p className="text-xs font-medium text-foreground truncate">{userInfo?.name ?? "Guest"}</p>
+            <p className="text-[10px] text-muted-foreground truncate">{userInfo?.email ?? ""}</p>
           </div>
+          <button
+            onClick={handleSignOut}
+            title="Sign out"
+            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+          </button>
         </div>
       </div>
     </aside>
