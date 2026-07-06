@@ -33,6 +33,27 @@ const items = [
 
 export function AppSidebar() {
   const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const navigate = useNavigate();
+  const [userInfo, setUserInfo] = useState<{ name: string; email: string } | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        const meta = (data.user.user_metadata ?? {}) as Record<string, string>;
+        setUserInfo({
+          name: meta.full_name || meta.name || data.user.email?.split("@")[0] || "You",
+          email: data.user.email ?? "",
+        });
+      }
+    });
+  }, []);
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+    toast.success("Signed out");
+    navigate({ to: "/auth" });
+  }
+
 
   return (
     <aside className="hidden md:flex w-64 shrink-0 flex-col border-r border-border bg-sidebar h-screen sticky top-0">
