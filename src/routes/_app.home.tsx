@@ -29,6 +29,7 @@ import {
   Repeat,
   Trash2,
   ArrowUp,
+  GripHorizontal,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_app/home")({
@@ -46,6 +47,11 @@ type ChatMessage = {
   role: "user" | "assistant";
   text: string;
 };
+
+const MIN_CHAT_HEIGHT = 320;
+const MAX_CHAT_HEIGHT = 800;
+const COLLAPSED_HEIGHT = 420;
+const EXPANDED_HEIGHT = 640;
 
 function HomePage() {
   const today = new Date().toLocaleDateString(undefined, {
@@ -69,6 +75,8 @@ function HomePage() {
       text: `Hi ${mockUser.name.split(" ")[0]} — ask me anything, or tell me a task to schedule. Try "Notify me every day at 8:30am how many meetings I have."`,
     },
   ]);
+  const [chatHeight, setChatHeight] = useState(COLLAPSED_HEIGHT);
+  const hasExpandedRef = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const todayMeetings = useMemo(
@@ -79,6 +87,13 @@ function HomePage() {
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollTop = el.scrollHeight;
+  }, [messages]);
+
+  useEffect(() => {
+    if (messages.length > 1 && !hasExpandedRef.current) {
+      hasExpandedRef.current = true;
+      setChatHeight(EXPANDED_HEIGHT);
+    }
   }, [messages]);
 
   function submit() {
@@ -110,6 +125,26 @@ function HomePage() {
     }, 350);
   }
 
+  function startResize(e: React.MouseEvent<HTMLDivElement>) {
+    e.preventDefault();
+    const startY = e.clientY;
+    const startHeight = chatHeight;
+    function onMouseMove(moveEvent: MouseEvent) {
+      const delta = moveEvent.clientY - startY;
+      const newHeight = Math.max(
+        MIN_CHAT_HEIGHT,
+        Math.min(MAX_CHAT_HEIGHT, startHeight + delta),
+      );
+      setChatHeight(newHeight);
+    }
+    function onMouseUp() {
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+    }
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-6 lg:px-10 py-10">
       <div className="grid lg:grid-cols-[1fr_320px] gap-8">
@@ -127,7 +162,10 @@ function HomePage() {
           </p>
 
           {/* Chat window */}
-          <div className="mt-6 rounded-3xl border border-border bg-card shadow-[var(--shadow-card)] flex flex-col overflow-hidden h-[640px]">
+          <div
+            className="mt-6 rounded-3xl border border-border bg-card shadow-[var(--shadow-card)] flex flex-col overflow-hidden"
+            style={{ height: chatHeight }}
+          >
             {/* Conversation */}
             <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
               {messages.map((m) => (
@@ -171,6 +209,15 @@ function HomePage() {
                   </button>
                 </div>
               </div>
+            </div>
+
+            {/* Resize handle */}
+            <div
+              onMouseDown={startResize}
+              className="h-4 w-full cursor-ns-resize flex items-center justify-center bg-card/60 hover:bg-border/40 transition-colors"
+              title="Drag to resize"
+            >
+              <GripHorizontal className="h-4 w-4 text-muted-foreground" />
             </div>
           </div>
 
