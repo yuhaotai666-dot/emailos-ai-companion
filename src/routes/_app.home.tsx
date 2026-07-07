@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   taskExamples,
   homeNeedToKnow,
@@ -8,7 +8,6 @@ import {
   mockUser,
   mockMeetings,
 } from "@/lib/mock-data";
-import { EmptyState } from "@/components/workspace/Common";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
@@ -42,6 +41,12 @@ export const Route = createFileRoute("/_app/home")({
   component: HomePage,
 });
 
+type ChatMessage = {
+  id: string;
+  role: "user" | "assistant";
+  text: string;
+};
+
 function HomePage() {
   const today = new Date().toLocaleDateString(undefined, {
     weekday: "long",
@@ -57,31 +62,56 @@ function HomePage() {
   const removeTask = useScheduledTasksStore((s) => s.remove);
 
   const [input, setInput] = useState("");
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      id: "welcome",
+      role: "assistant",
+      text: `Hi ${mockUser.name.split(" ")[0]} — ask me anything, or tell me a task to schedule. Try "Notify me every day at 8:30am how many meetings I have."`,
+    },
+  ]);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const todayMeetings = useMemo(
     () => mockMeetings.filter((m) => /^today/i.test(m.time)),
     [],
   );
 
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages]);
+
   function submit() {
     const value = input.trim();
     if (!value) return;
+
+    const userMsg: ChatMessage = { id: crypto.randomUUID(), role: "user", text: value };
+    setMessages((m) => [...m, userMsg]);
+    setInput("");
+
     const sched = detectSchedule(value);
+    let replyText: string;
     if (sched) {
       const t = addTask({ prompt: value, schedule: sched.schedule, time: sched.time });
-      toast.success("Scheduled task created", {
-        description: `${describeSchedule(t)} — Ivy will run this automatically.`,
-      });
+      replyText = `Scheduled — ${describeSchedule(t)}. I'll run this automatically and you can manage it below.`;
+      toast.success("Scheduled task created", { description: describeSchedule(t) });
+    } else if (/meeting/i.test(value)) {
+      const count = todayMeetings.length;
+      const times = todayMeetings.map((m) => m.time.replace(/^Today\s*·\s*/i, "")).join(", ");
+      replyText = count
+        ? `You have ${count} meeting${count === 1 ? "" : "s"} today${times ? ` — ${times}` : ""}.`
+        : "You have no meetings today.";
     } else {
-      toast("Task received", {
-        description: "Ivy will work on this now. (Add words like 'every day' to schedule it.)",
-      });
+      replyText = "Got it — I'll work on this and update you here. Add words like \"every day\" or \"at 9am\" to schedule it.";
     }
-    setInput("");
+
+    setTimeout(() => {
+      setMessages((m) => [...m, { id: crypto.randomUUID(), role: "assistant", text: replyText }]);
+    }, 350);
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-6 lg:px-10 py-10">
+    <div className="mx-auto max-w-7xl px-6 lg:px-10 py-10">
       <div className="grid lg:grid-cols-[1fr_320px] gap-8">
         {/* Main column */}
         <div>
@@ -90,43 +120,56 @@ function HomePage() {
           </div>
 
           <h1 className="mt-3 font-serif text-4xl sm:text-5xl text-foreground leading-tight">
-            {greeting}, {mockUser.name}. You have 7 emails that need your attention.
+            {greeting}, {mockUser.name}.
           </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Chat with Ivy — ask questions, schedule tasks, or get a briefing.
+          </p>
 
-          {/* Task input */}
-          <div className="mt-8 rounded-3xl border border-border bg-card shadow-[var(--shadow-card)] p-5">
-            <Textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  submit();
-                }
-              }}
-              placeholder="Give Ivy a task — try 'Notify me every day at 8:30am how many meetings I have.'"
-              className="min-h-[76px] border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none p-0 text-sm bg-transparent"
-            />
-            <div className="mt-2 flex items-center gap-1.5">
-              <IconButton icon={Plus} label="Add" />
-              <IconButton icon={UserRound} label="People" />
-              <IconButton
-                icon={CalendarClock}
-                label="Schedule"
-                onClick={() => setInput((v) => (v ? v : "Notify me every day at 8:30am how many meetings I have today and the times."))}
+          {/* Chat window */}
+          <div className="mt-6 rounded-3xl border border-border bg-card shadow-[var(--shadow-card)] flex flex-col overflow-hidden h-[640px]">
+            {/* Conversation */}
+            <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
+              {messages.map((m) => (
+                <MessageBubble key={m.id} message={m} userName={mockUser.name} />
+              ))}
+            </div>
+
+            {/* Composer */}
+            <div className="border-t border-border bg-card/60 px-5 pt-4 pb-4">
+              <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    submit();
+                  }
+                }}
+                placeholder="Message Ivy…"
+                className="min-h-[64px] border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none p-0 text-sm bg-transparent"
               />
-              <IconButton icon={ShieldCheck} label="Approval mode" />
-              <div className="ml-auto flex items-center gap-1.5">
-                <button className="flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-xs text-foreground hover:bg-cream transition-colors">
-                  Task <ChevronDown className="h-3 w-3" />
-                </button>
-                <button
-                  onClick={submit}
-                  aria-label="Send task"
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-background hover:opacity-90 transition-opacity"
-                >
-                  {input.trim() ? <ArrowUp className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
-                </button>
+              <div className="mt-2 flex items-center gap-1.5">
+                <IconButton icon={Plus} label="Add" />
+                <IconButton icon={UserRound} label="People" />
+                <IconButton
+                  icon={CalendarClock}
+                  label="Schedule"
+                  onClick={() => setInput((v) => v || "Notify me every day at 8:30am how many meetings I have today and the times.")}
+                />
+                <IconButton icon={ShieldCheck} label="Approval mode" />
+                <div className="ml-auto flex items-center gap-1.5">
+                  <button className="flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-xs text-foreground hover:bg-cream transition-colors">
+                    Task <ChevronDown className="h-3 w-3" />
+                  </button>
+                  <button
+                    onClick={submit}
+                    aria-label="Send task"
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-background hover:opacity-90 transition-opacity"
+                  >
+                    {input.trim() ? <ArrowUp className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -144,8 +187,8 @@ function HomePage() {
             ))}
           </div>
 
-          {/* Tasks & Recents */}
-          <div className="mt-10 grid gap-8">
+          {/* Tasks */}
+          <div className="mt-10">
             <section>
               <div className="flex items-baseline justify-between mb-3">
                 <h2 className="text-sm font-medium text-foreground">Tasks</h2>
@@ -154,7 +197,11 @@ function HomePage() {
                 </span>
               </div>
               {tasks.length === 0 ? (
-                <EmptyState title="Nothing here yet" hint="Give Ivy a task above and it'll show up here." />
+                <div className="rounded-2xl border border-dashed border-border bg-cream/40 px-6 py-8 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    No scheduled tasks yet. Ask Ivy above to schedule something.
+                  </p>
+                </div>
               ) : (
                 <ul className="grid gap-2">
                   {tasks.map((t) => (
@@ -169,16 +216,6 @@ function HomePage() {
                   ))}
                 </ul>
               )}
-            </section>
-
-            <section>
-              <div className="flex items-baseline justify-between mb-3">
-                <h2 className="text-sm font-medium text-foreground">Recents</h2>
-                <Link to="/inbox" className="text-xs text-muted-foreground hover:text-foreground">
-                  See all
-                </Link>
-              </div>
-              <EmptyState title="No recent activity" hint="Your recent tasks and drafts will appear here." />
             </section>
           </div>
         </div>
@@ -226,6 +263,31 @@ function HomePage() {
   );
 }
 
+function MessageBubble({ message, userName }: { message: ChatMessage; userName: string }) {
+  const isUser = message.role === "user";
+  if (isUser) {
+    return (
+      <div className="flex justify-end">
+        <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-primary text-primary-foreground px-4 py-2.5 text-sm leading-relaxed shadow-[var(--shadow-soft)]">
+          {message.text}
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="flex gap-3">
+      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cream border border-border">
+        <Sparkles className="h-3.5 w-3.5 text-accent" />
+      </span>
+      <div className="max-w-[80%]">
+        <p className="text-[11px] text-muted-foreground mb-1">Ivy</p>
+        <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{message.text}</p>
+        <span className="sr-only">to {userName}</span>
+      </div>
+    </div>
+  );
+}
+
 function TaskRow({
   task,
   onToggle,
@@ -239,7 +301,6 @@ function TaskRow({
   meetingCount: number;
   meetingTimes: string[];
 }) {
-  // Detect the meeting-briefing task by keywords to show a live preview
   const isMeetingBrief = /meeting/i.test(task.prompt);
   return (
     <li className="rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-soft)]">
