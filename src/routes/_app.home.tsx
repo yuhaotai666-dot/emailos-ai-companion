@@ -157,9 +157,6 @@ function HomePage() {
           <h1 className="mt-3 font-serif text-4xl sm:text-5xl text-foreground leading-tight">
             {greeting}, {mockUser.name}.
           </h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Chat with Ivy — ask questions, schedule tasks, or get a briefing.
-          </p>
 
           {/* Chat window */}
           <div
