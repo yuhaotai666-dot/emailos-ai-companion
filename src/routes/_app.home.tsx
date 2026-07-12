@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { taskExamples } from "@/lib/mock-data";
 import {
   useBrief,
@@ -12,7 +12,6 @@ import {
   useUserName,
   type ChatEvent,
 } from "@/lib/api/queries";
-import { EmptyState } from "@/components/workspace/Common";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
@@ -34,13 +33,8 @@ import {
   Repeat,
   Trash2,
   ArrowUp,
+  GripHorizontal,
 } from "lucide-react";
-
-interface ChatTurn {
-  role: "user" | "ivy";
-  text: string;
-  events?: ChatEvent[];
-}
 
 export const Route = createFileRoute("/_app/home")({
   head: () => ({
@@ -51,6 +45,18 @@ export const Route = createFileRoute("/_app/home")({
   }),
   component: HomePage,
 });
+
+type ChatMessage = {
+  id: string;
+  role: "user" | "assistant";
+  text: string;
+  events?: ChatEvent[];
+};
+
+const MIN_CHAT_HEIGHT = 320;
+const MAX_CHAT_HEIGHT = 800;
+const COLLAPSED_HEIGHT = 420;
+const EXPANDED_HEIGHT = 640;
 
 function HomePage() {
   const today = new Date().toLocaleDateString(undefined, {
@@ -67,6 +73,16 @@ function HomePage() {
   const removeTask = useScheduledTasksStore((s) => s.remove);
 
   const [input, setInput] = useState("");
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      id: "welcome",
+      role: "assistant",
+      text: 'Hi — ask me anything, or tell me a task to schedule. Try "Notify me every day at 8:30am how many meetings I have."',
+    },
+  ]);
+  const [chatHeight, setChatHeight] = useState(COLLAPSED_HEIGHT);
+  const hasExpandedRef = useRef(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const { data: userName = "there" } = useUserName();
   const { data: brief } = useBrief();
@@ -76,16 +92,34 @@ function HomePage() {
   const createRoutine = useCreateRoutine();
   const ivy = useIvyChat();
 
-  const [thread, setThread] = useState<ChatTurn[]>([]);
-
   const todayMeetings = useMemo(
     () => meetings.filter((m) => /^today/i.test(m.time)),
     [meetings],
   );
 
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages, ivy.isPending]);
+
+  useEffect(() => {
+    if (messages.length > 1 && !hasExpandedRef.current) {
+      hasExpandedRef.current = true;
+      setChatHeight(EXPANDED_HEIGHT);
+    }
+  }, [messages]);
+
+  function pushAssistant(text: string, events?: ChatEvent[]) {
+    setMessages((m) => [...m, { id: crypto.randomUUID(), role: "assistant", text, events }]);
+  }
+
   function submit() {
     const value = input.trim();
     if (!value) return;
+
+    setMessages((m) => [...m, { id: crypto.randomUUID(), role: "user", text: value }]);
+    setInput("");
+
     const sched = detectSchedule(value);
     if (sched) {
       // Persist to the backend so the scheduler actually runs it; fall back
@@ -94,36 +128,50 @@ function HomePage() {
         { title: value.slice(0, 60), prompt: value, time: sched.time, schedule: sched.schedule },
         {
           onSuccess: () =>
-            toast.success("Routine created", {
-              description: "Ivy will run this automatically — see Powers → Routines.",
-            }),
+            pushAssistant(
+              `Scheduled — I'll run this ${sched.schedule} at ${sched.time}. Manage it in Powers → Routines; results appear in "Need to know".`,
+            ),
           onError: () => {
             const t = addTask({ prompt: value, schedule: sched.schedule, time: sched.time });
             toast.success("Scheduled task saved locally", {
               description: `${describeSchedule(t)} — connect the backend to run it for real.`,
             });
+            pushAssistant(`Saved locally — ${describeSchedule(t)}. Start the backend so I can actually run it.`);
           },
         },
       );
-      setInput("");
       return;
     }
+
     // Everything else goes to Ivy — she plans, delegates to specialists, reviews.
-    setThread((t) => [...t, { role: "user", text: value }]);
     ivy.mutate(value, {
-      onSuccess: (r) =>
-        setThread((t) => [...t, { role: "ivy", text: r.reply, events: r.events }]),
-      onError: () =>
-        setThread((t) => [
-          ...t,
-          { role: "ivy", text: "后端未启动 — 启动 backend 后我就能真正干活了。", events: [] },
-        ]),
+      onSuccess: (r) => pushAssistant(r.reply, r.events),
+      onError: () => pushAssistant("Backend offline — start it and I can actually help."),
     });
-    setInput("");
+  }
+
+  function startResize(e: React.MouseEvent<HTMLDivElement>) {
+    e.preventDefault();
+    const startY = e.clientY;
+    const startHeight = chatHeight;
+    function onMouseMove(moveEvent: MouseEvent) {
+      const delta = moveEvent.clientY - startY;
+      const newHeight = Math.max(
+        MIN_CHAT_HEIGHT,
+        Math.min(MAX_CHAT_HEIGHT, startHeight + delta),
+      );
+      setChatHeight(newHeight);
+    }
+    function onMouseUp() {
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+    }
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-6 lg:px-10 py-10">
+    <div className="mx-auto max-w-7xl px-6 lg:px-10 py-10">
       <div className="grid lg:grid-cols-[1fr_320px] gap-8">
         {/* Main column */}
         <div>
@@ -135,90 +183,78 @@ function HomePage() {
             {greeting}, {userName}.{" "}
             {brief
               ? `You have ${brief.needsAttention} email${brief.needsAttention === 1 ? "" : "s"} that need your attention.`
-              : "Loading your briefing…"}
+              : ""}
           </h1>
 
-          {/* Task input */}
-          <div className="mt-8 rounded-3xl border border-border bg-card shadow-[var(--shadow-card)] p-5">
-            <Textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  submit();
-                }
-              }}
-              placeholder="Give Ivy a task — try 'Notify me every day at 8:30am how many meetings I have.'"
-              className="min-h-[76px] border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none p-0 text-sm bg-transparent"
-            />
-            <div className="mt-2 flex items-center gap-1.5">
-              <IconButton icon={Plus} label="Add" />
-              <IconButton icon={UserRound} label="People" />
-              <IconButton
-                icon={CalendarClock}
-                label="Schedule"
-                onClick={() => setInput((v) => (v ? v : "Notify me every day at 8:30am how many meetings I have today and the times."))}
-              />
-              <IconButton icon={ShieldCheck} label="Approval mode" />
-              <div className="ml-auto flex items-center gap-1.5">
-                <button className="flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-xs text-foreground hover:bg-cream transition-colors">
-                  Task <ChevronDown className="h-3 w-3" />
-                </button>
-                <button
-                  onClick={submit}
-                  aria-label="Send task"
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-background hover:opacity-90 transition-opacity"
-                >
-                  {input.trim() ? <ArrowUp className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Conversation with Ivy */}
-          {(thread.length > 0 || ivy.isPending) && (
-            <div className="mt-4 grid gap-2">
-              {thread.map((turn, i) => (
-                <div
-                  key={i}
-                  className={
-                    "rounded-2xl border px-4 py-3 text-sm leading-relaxed " +
-                    (turn.role === "user"
-                      ? "border-border bg-cream/60 text-foreground ml-10"
-                      : "border-border bg-card text-foreground mr-6 shadow-[var(--shadow-soft)]")
-                  }
-                >
-                  {turn.role === "ivy" && (
-                    <div className="mb-1 flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                      <Sparkles className="h-3 w-3 text-accent" /> Ivy
-                    </div>
-                  )}
-                  <p className="whitespace-pre-wrap">{turn.text}</p>
-                  {turn.events && turn.events.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {turn.events.map((e, j) => (
-                        <span
-                          key={j}
-                          className="inline-flex items-center rounded-full border border-border bg-cream/70 px-2 py-0.5 text-[10px] text-muted-foreground"
-                        >
-                          {e.label}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
+          {/* Chat window */}
+          <div
+            className="mt-6 rounded-3xl border border-border bg-card shadow-[var(--shadow-card)] flex flex-col overflow-hidden"
+            style={{ height: chatHeight }}
+          >
+            {/* Conversation */}
+            <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
+              {messages.map((m) => (
+                <MessageBubble key={m.id} message={m} />
               ))}
               {ivy.isPending && (
-                <div className="rounded-2xl border border-border bg-card px-4 py-3 text-sm text-muted-foreground mr-6">
-                  <span className="inline-flex items-center gap-1.5">
-                    <Sparkles className="h-3 w-3 text-accent animate-pulse" />
-                    Ivy 正在规划 / 派活 / 审核…
+                <div className="flex gap-3">
+                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cream border border-border">
+                    <Sparkles className="h-3.5 w-3.5 text-accent animate-pulse" />
                   </span>
+                  <p className="text-sm text-muted-foreground leading-relaxed pt-1.5">
+                    Planning / delegating / reviewing…
+                  </p>
                 </div>
               )}
             </div>
-          )}
+
+            {/* Composer */}
+            <div className="border-t border-border bg-card/60 px-5 pt-4 pb-4">
+              <Textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    submit();
+                  }
+                }}
+                placeholder="Message Ivy…"
+                className="min-h-[64px] border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 resize-none p-0 text-sm bg-transparent"
+              />
+              <div className="mt-2 flex items-center gap-1.5">
+                <IconButton icon={Plus} label="Add" />
+                <IconButton icon={UserRound} label="People" />
+                <IconButton
+                  icon={CalendarClock}
+                  label="Schedule"
+                  onClick={() => setInput((v) => v || "Notify me every day at 8:30am how many meetings I have today and the times.")}
+                />
+                <IconButton icon={ShieldCheck} label="Approval mode" />
+                <div className="ml-auto flex items-center gap-1.5">
+                  <button className="flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-xs text-foreground hover:bg-cream transition-colors">
+                    Task <ChevronDown className="h-3 w-3" />
+                  </button>
+                  <button
+                    onClick={submit}
+                    aria-label="Send task"
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground text-background hover:opacity-90 transition-opacity"
+                  >
+                    {input.trim() ? <ArrowUp className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Resize handle */}
+            <div
+              onMouseDown={startResize}
+              className="h-4 w-full cursor-ns-resize flex items-center justify-center bg-card/60 hover:bg-border/40 transition-colors"
+              title="Drag to resize"
+            >
+              <GripHorizontal className="h-4 w-4 text-muted-foreground" />
+            </div>
+          </div>
 
           {/* Example prompts */}
           <div className="mt-4 flex flex-wrap gap-2">
@@ -233,8 +269,8 @@ function HomePage() {
             ))}
           </div>
 
-          {/* Tasks & Recents */}
-          <div className="mt-10 grid gap-8">
+          {/* Tasks */}
+          <div className="mt-10">
             <section>
               <div className="flex items-baseline justify-between mb-3">
                 <h2 className="text-sm font-medium text-foreground">Tasks</h2>
@@ -243,7 +279,11 @@ function HomePage() {
                 </span>
               </div>
               {tasks.length === 0 ? (
-                <EmptyState title="Nothing here yet" hint="Give Ivy a task above and it'll show up here." />
+                <div className="rounded-2xl border border-dashed border-border bg-cream/40 px-6 py-8 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    No scheduled tasks yet. Ask Ivy above to schedule something.
+                  </p>
+                </div>
               ) : (
                 <ul className="grid gap-2">
                   {tasks.map((t) => (
@@ -258,16 +298,6 @@ function HomePage() {
                   ))}
                 </ul>
               )}
-            </section>
-
-            <section>
-              <div className="flex items-baseline justify-between mb-3">
-                <h2 className="text-sm font-medium text-foreground">Recents</h2>
-                <Link to="/inbox" className="text-xs text-muted-foreground hover:text-foreground">
-                  See all
-                </Link>
-              </div>
-              <EmptyState title="No recent activity" hint="Your recent tasks and drafts will appear here." />
             </section>
           </div>
         </div>
@@ -353,6 +383,42 @@ function HomePage() {
   );
 }
 
+function MessageBubble({ message }: { message: ChatMessage }) {
+  const isUser = message.role === "user";
+  if (isUser) {
+    return (
+      <div className="flex justify-end">
+        <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-primary text-primary-foreground px-4 py-2.5 text-sm leading-relaxed shadow-[var(--shadow-soft)]">
+          {message.text}
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="flex gap-3">
+      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cream border border-border">
+        <Sparkles className="h-3.5 w-3.5 text-accent" />
+      </span>
+      <div className="max-w-[80%]">
+        <p className="text-[11px] text-muted-foreground mb-1">Ivy</p>
+        <p className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{message.text}</p>
+        {message.events && message.events.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {message.events.map((e, j) => (
+              <span
+                key={j}
+                className="inline-flex items-center rounded-full border border-border bg-cream/70 px-2 py-0.5 text-[10px] text-muted-foreground"
+              >
+                {e.label}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function TaskRow({
   task,
   onToggle,
@@ -366,7 +432,6 @@ function TaskRow({
   meetingCount: number;
   meetingTimes: string[];
 }) {
-  // Detect the meeting-briefing task by keywords to show a live preview
   const isMeetingBrief = /meeting/i.test(task.prompt);
   return (
     <li className="rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-soft)]">
