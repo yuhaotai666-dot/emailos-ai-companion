@@ -487,9 +487,14 @@ const SKILL_TONES = [
 ];
 
 function MySkills() {
-  // Custom specialists Ivy spawned from user requests (kind !== system).
+  // Custom specialists Ivy spawned from user requests, plus system agents
+  // that have "graduated" into an employee (has a display_name) and whose
+  // integration is actually linked. System agents without a display_name
+  // (meeting-agent, reminder-agent today) stay under "Ivy's core team".
   const { data: specialists = [] } = useSpecialists();
-  const mine = specialists.filter((s) => s.kind !== "system");
+  const mine = specialists.filter(
+    (s) => s.kind !== "system" || (s.display_name && s.connected !== false),
+  );
 
   if (mine.length === 0) {
     return (
@@ -514,11 +519,11 @@ function MySkills() {
                 SKILL_TONES[i % SKILL_TONES.length]
               }
             >
-              {s.name.charAt(0).toUpperCase()}
+              {(s.display_name ?? s.name).charAt(0).toUpperCase()}
             </span>
             <span className="text-[11px] text-muted-foreground">used {s.runs}x</span>
           </div>
-          <h3 className="font-medium text-foreground text-sm">{s.name}</h3>
+          <h3 className="font-medium text-foreground text-sm">{s.display_name ?? s.name}</h3>
           <p className="mt-2 text-xs text-muted-foreground flex-1">{s.description}</p>
           <div className="mt-3 flex flex-wrap gap-1">
             {s.tools.map((t) => (
@@ -537,9 +542,10 @@ function MySkills() {
 }
 
 function SystemTeam() {
-  // The built-in domain agents (email / meeting / reminder).
+  // The built-in domain agents that haven't graduated into "My Skills" —
+  // i.e. don't have a display_name yet (meeting-agent, reminder-agent today).
   const { data: specialists = [] } = useSpecialists();
-  const system = specialists.filter((s) => s.kind === "system");
+  const system = specialists.filter((s) => s.kind === "system" && !s.display_name);
 
   if (system.length === 0) {
     return (

@@ -296,6 +296,10 @@ export interface Specialist {
   last_used_at?: string | null;
   /** "system" for the built-in email/meeting/reminder agents, "custom" for user-created. */
   kind?: string;
+  /** Human-facing name for system agents that graduate into "My Skills", e.g. "Email Employee". */
+  display_name?: string | null;
+  /** For system agents with a display_name: whether the underlying integration is actually linked. */
+  connected?: boolean;
 }
 
 export function useSpecialists() {
