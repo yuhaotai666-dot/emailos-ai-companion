@@ -642,7 +642,7 @@ function IntegrationsTab() {
     <div>
       <SectionHeader
         title="Integrations"
-        subtitle="Connect third-party services like Gmail, Calendar, and WhatsApp so Ivy can act across the tools you already use."
+        subtitle="Google (Gmail + Calendar, read-only) is live today. The rest of the catalog is on the roadmap — marked Coming soon until each one actually works."
       />
 
       <div className="flex items-center gap-3 mb-5">
@@ -687,25 +687,46 @@ function IntegrationsTab() {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((i) => (
-          <div
-            key={i.id}
-            className="rounded-2xl border border-border bg-card px-4 py-3 flex items-center gap-3 hover:shadow-[var(--shadow-soft)] transition cursor-pointer"
-          >
-            <span
+        {filtered.map((i) => {
+          // Only Google is a real integration today; the rest are roadmap
+          // entries and must not pretend to be connectable.
+          const comingSoon = i.id !== "google";
+          return (
+            <div
+              key={i.id}
               className={
-                "h-10 w-10 rounded-xl flex items-center justify-center font-medium " +
-                i.tone
+                "rounded-2xl border border-border bg-card px-4 py-3 flex items-center gap-3 transition " +
+                (comingSoon ? "opacity-55" : "hover:shadow-[var(--shadow-soft)]")
               }
             >
-              {i.letter}
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-medium text-foreground truncate">{i.name}</p>
-              <p className="text-xs text-muted-foreground truncate">{i.description}</p>
+              <span
+                className={
+                  "h-10 w-10 rounded-xl flex items-center justify-center font-medium " +
+                  i.tone
+                }
+              >
+                {i.letter}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-medium text-foreground truncate">{i.name}</p>
+                <p className="text-xs text-muted-foreground truncate">{i.description}</p>
+              </div>
+              {comingSoon ? (
+                <span className="text-[10px] rounded-full border border-border bg-background px-2 py-0.5 text-muted-foreground whitespace-nowrap">
+                  Coming soon
+                </span>
+              ) : i.connected ? (
+                <span className="text-[10px] rounded-full bg-emerald-100 text-emerald-700 px-2 py-0.5 whitespace-nowrap">
+                  Connected
+                </span>
+              ) : (
+                <span className="text-[10px] rounded-full border border-border bg-background px-2 py-0.5 text-muted-foreground whitespace-nowrap">
+                  Not connected
+                </span>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
