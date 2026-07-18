@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 
+import { supabase } from "@/integrations/supabase/client";
 import { cachedOnboarded, fetchOnboarded } from "@/lib/onboarding-status";
 
 export const Route = createFileRoute("/")({
@@ -16,6 +17,12 @@ function RootRedirect() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      // OAuth redirects land here with the session token in the URL hash.
+      // Supabase consumes it during client init — awaiting getSession forces
+      // that init to complete while the hash is still in the URL. Navigating
+      // first would strip the hash and lose the login (auth loop).
+      await supabase.auth.getSession();
+      if (cancelled) return;
       if (cachedOnboarded()) {
         navigate({ to: "/home", replace: true });
         return;
