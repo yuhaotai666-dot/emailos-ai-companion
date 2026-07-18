@@ -240,7 +240,7 @@ function InboxPage() {
                   <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">
                     Full message
                   </p>
-                  <div className="rounded-2xl border border-border bg-cream/40 px-4 py-4 text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                  <div className="rounded-2xl border-2 border-border bg-cream/40 px-6 py-5 text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap max-h-[420px] overflow-y-auto">
                     {openEmail.bodyPreview
                       ? `${openEmail.bodyPreview}\n\n— ${openEmail.sender}`
                       : `Hi Theo,\n\n${openEmail.summary}\n\n${openEmail.reason}\n\nBest,\n${openEmail.sender}`}
