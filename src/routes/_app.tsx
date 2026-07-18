@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { AppSidebar } from "@/components/workspace/AppSidebar";
 import { supabase } from "@/integrations/supabase/client";
+import { useHydrateEvents } from "@/lib/events-store";
 
 export const Route = createFileRoute("/_app")({
   component: WorkspaceLayout,
@@ -11,6 +12,7 @@ export const Route = createFileRoute("/_app")({
 function WorkspaceLayout() {
   const navigate = useNavigate();
   const [session, setSession] = useState<Session | null | undefined>(undefined);
+  useHydrateEvents(); // load the account's manual event tags once per visit
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
