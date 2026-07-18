@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+import { markOnboarded } from "@/lib/onboarding-status";
+
 export interface OnboardingState {
   timezone: string;
   theme: "system" | "light" | "dark";
@@ -65,9 +67,10 @@ export const useOnboarding = create<OnboardingState>()(
           },
         })),
       finish: () => {
-        if (typeof window !== "undefined") {
-          window.localStorage.setItem("emailos_onboarded", "true");
-        }
+        // Persists completion to the account profile on the backend
+        // (localStorage is just a per-browser cache) — fire-and-forget so
+        // navigation isn't blocked on the network.
+        void markOnboarded();
       },
       reset: () => {
         if (typeof window !== "undefined") {

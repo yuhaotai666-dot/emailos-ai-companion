@@ -120,6 +120,8 @@ export interface ApiUserProfile {
   company: string;
   assistant_name: string;
   routines: string[];
+  /** Completed the onboarding flow. Account-level, not per-browser. */
+  onboarded?: boolean;
 }
 
 export interface TriageResultApi {
