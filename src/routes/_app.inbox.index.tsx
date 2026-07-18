@@ -83,6 +83,13 @@ function InboxPage() {
     eventFilter === "all" ? true : emailEventMap[e.id] === eventFilter,
   );
 
+  // Review-queue order: High → Medium → Low → untriaged. Sort is stable, so
+  // within the same priority the backend's (newest-first) order is kept.
+  const PRIORITY_RANK: Record<string, number> = { High: 0, Medium: 1, Low: 2 };
+  const sorted = [...filtered].sort(
+    (a, b) => (PRIORITY_RANK[a.priority ?? ""] ?? 3) - (PRIORITY_RANK[b.priority ?? ""] ?? 3),
+  );
+
   return (
     <div className="mx-auto max-w-5xl px-6 lg:px-10 py-10">
       <PageHeader
@@ -130,7 +137,7 @@ function InboxPage() {
 
 
       <div className="grid gap-3">
-        {filtered.map((e) => {
+        {sorted.map((e) => {
           const evId = emailEventMap[e.id];
           const ev = events.find((x) => x.id === evId);
           return (
