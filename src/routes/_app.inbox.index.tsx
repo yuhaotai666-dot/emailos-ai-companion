@@ -251,13 +251,33 @@ function InboxPage() {
               <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
                 <div>
                   <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">
-                    Full message
+                    Latest message
                   </p>
-                  <div className="rounded-2xl border-2 border-border bg-cream/40 px-6 py-5 text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap max-h-[420px] overflow-y-auto">
-                    {openEmail.bodyPreview
-                      ? `${openEmail.bodyPreview}\n\n— ${openEmail.sender}`
-                      : `Hi Theo,\n\n${openEmail.summary}\n\n${openEmail.reason}\n\nBest,\n${openEmail.sender}`}
+                  <div className="rounded-2xl border-2 border-border bg-cream/40 max-h-[440px] overflow-y-auto">
+                    {/* Gmail-style header: who sent it, to whom, when. */}
+                    <div className="flex items-start gap-3 px-6 pt-5 pb-3 border-b border-border/60">
+                      <div className="h-9 w-9 rounded-full bg-foreground/10 flex items-center justify-center text-xs font-medium text-foreground shrink-0">
+                        {openEmail.sender.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">
+                          {openEmail.sender}{" "}
+                          <span className="font-normal text-muted-foreground">
+                            &lt;{openEmail.senderEmail}&gt;
+                          </span>
+                        </p>
+                        <p className="text-xs text-muted-foreground">to me · {openEmail.time}</p>
+                      </div>
+                    </div>
+                    <div className="px-6 py-4 text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                      {openEmail.bodyPreview
+                        ? openEmail.bodyPreview
+                        : `${openEmail.summary}\n\n${openEmail.reason}`}
+                    </div>
                   </div>
+                  <p className="mt-2 text-[11px] text-muted-foreground">
+                    Showing the latest message in this thread. Earlier replies are quoted in Gmail.
+                  </p>
                 </div>
 
               </div>
