@@ -89,12 +89,12 @@ function InboxPage() {
     eventFilter === "all" ? true : emailEventMap[e.id] === eventFilter,
   );
 
-  // Review-queue order: High → Medium → Low → untriaged. Sort is stable, so
-  // within the same priority the backend's (newest-first) order is kept.
-  const PRIORITY_RANK: Record<string, number> = { High: 0, Medium: 1, Low: 2 };
-  const sorted = [...filtered].sort(
-    (a, b) => (PRIORITY_RANK[a.priority ?? ""] ?? 3) - (PRIORITY_RANK[b.priority ?? ""] ?? 3),
-  );
+  // Review-queue order: High → Medium → Low → untriaged. Priority values are
+  // lowercased by the mapper; untriaged messages (no real classification yet)
+  // sink to the bottom. Stable sort keeps newest-first within a priority band.
+  const PRIORITY_RANK: Record<string, number> = { high: 0, medium: 1, low: 2 };
+  const rankOf = (e: MockEmail) => (e.triaged ? PRIORITY_RANK[e.priority] ?? 2 : 3);
+  const sorted = [...filtered].sort((a, b) => rankOf(a) - rankOf(b));
 
   return (
     <div className="mx-auto max-w-5xl px-6 lg:px-10 py-10">
@@ -161,8 +161,16 @@ function InboxPage() {
                   <h3 className="mt-1 text-base font-medium text-foreground line-clamp-1">{e.subject}</h3>
                 </div>
                 <div className="flex flex-col items-end gap-1.5 shrink-0">
-                  <PriorityBadge priority={e.priority} />
-                  <CategoryBadge category={e.category} />
+                  {e.triaged ? (
+                    <>
+                      <PriorityBadge priority={e.priority} />
+                      <CategoryBadge category={e.category} />
+                    </>
+                  ) : (
+                    <span className="inline-flex items-center rounded-full border border-dashed border-border bg-cream/60 px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                      Untriaged
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -248,8 +256,16 @@ function InboxPage() {
                     </SheetDescription>
                   </div>
                   <div className="flex flex-col items-end gap-1.5 shrink-0">
-                    <PriorityBadge priority={openEmail.priority} />
-                    <CategoryBadge category={openEmail.category} />
+                    {openEmail.triaged ? (
+                      <>
+                        <PriorityBadge priority={openEmail.priority} />
+                        <CategoryBadge category={openEmail.category} />
+                      </>
+                    ) : (
+                      <span className="inline-flex items-center rounded-full border border-dashed border-border bg-cream/60 px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                        Untriaged
+                      </span>
+                    )}
                   </div>
                 </div>
               </SheetHeader>

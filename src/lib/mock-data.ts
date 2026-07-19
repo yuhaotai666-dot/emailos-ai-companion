@@ -28,6 +28,9 @@ export interface MockEmail {
   /** A newer reply arrived after the last triage — analysis shown (if any) is
    *  stale, so the UI should prompt a re-triage instead of trusting it. */
   needsRetriage?: boolean;
+  /** This message has a real triage result. When false, priority/category are
+   *  placeholders and must not be shown as if classified. */
+  triaged?: boolean;
 }
 
 export const mockUser = {

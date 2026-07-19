@@ -58,6 +58,9 @@ export function toMockEmail(e: EmailView): MockEmail {
     filter: e.category ?? undefined,
     bodyPreview: e.body_preview || undefined,
     needsRetriage: e.needs_retriage ?? false,
+    // Real classification present only when the backend sent a category and
+    // the shown message isn't awaiting a re-triage.
+    triaged: e.category != null && !(e.needs_retriage ?? false),
   };
 }
 
