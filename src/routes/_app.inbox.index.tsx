@@ -162,16 +162,27 @@ function InboxPage() {
 
               <p className="mt-3 text-sm text-foreground/85 leading-relaxed">{e.summary}</p>
 
-              <div className="mt-4 grid sm:grid-cols-2 gap-3">
-                <div className="rounded-xl bg-cream/60 border border-border/60 px-3 py-2">
-                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Suggested action</p>
-                  <p className="text-xs text-foreground mt-0.5">{e.suggestedAction}</p>
+              {e.needsRetriage || !e.suggestedAction ? (
+                <div className="mt-4 rounded-xl border border-dashed border-border/70 bg-cream/40 px-3 py-2.5 flex items-center gap-2">
+                  <RefreshCw className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                  <p className="text-xs text-muted-foreground">
+                    {e.needsRetriage
+                      ? "A newer reply arrived — run triage to refresh the analysis for this message."
+                      : "Not analyzed yet — run triage to generate a suggested action and draft."}
+                  </p>
                 </div>
-                <div className="rounded-xl bg-cream/60 border border-border/60 px-3 py-2">
-                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Why this matters</p>
-                  <p className="text-xs text-foreground mt-0.5">{e.reason}</p>
+              ) : (
+                <div className="mt-4 grid sm:grid-cols-2 gap-3">
+                  <div className="rounded-xl bg-cream/60 border border-border/60 px-3 py-2">
+                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Suggested action</p>
+                    <p className="text-xs text-foreground mt-0.5">{e.suggestedAction}</p>
+                  </div>
+                  <div className="rounded-xl bg-cream/60 border border-border/60 px-3 py-2">
+                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Why this matters</p>
+                    <p className="text-xs text-foreground mt-0.5">{e.reason}</p>
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 <Button

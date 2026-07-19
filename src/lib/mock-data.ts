@@ -25,6 +25,9 @@ export interface MockEmail {
   filter?: string;
   /** Real snippet of the email body (present when data comes from the backend). */
   bodyPreview?: string;
+  /** A newer reply arrived after the last triage — analysis shown (if any) is
+   *  stale, so the UI should prompt a re-triage instead of trusting it. */
+  needsRetriage?: boolean;
 }
 
 export const mockUser = {

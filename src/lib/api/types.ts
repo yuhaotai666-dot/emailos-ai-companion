@@ -20,6 +20,7 @@ export interface EmailView {
   confidence?: number | null;
   draft_id?: string | null;
   draft_preview?: string | null;
+  needs_retriage?: boolean;
 }
 
 export interface MemorySection {
