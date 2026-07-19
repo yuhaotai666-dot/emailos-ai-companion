@@ -66,7 +66,13 @@ function InboxPage() {
   const { data: emails = [], isLoading } = useEmails();
   const runTriage = useRunTriage();
 
-  const visibleEmails = emails.filter((e) => !finished[e.id]);
+  // The review queue only surfaces emails that actually need a reply. FYI /
+  // newsletters / no-action mail is filtered out. A freshly-arrived reply that
+  // hasn't been triaged yet (needsRetriage) is kept — it's an inbound message
+  // awaiting analysis, not something to hide.
+  const visibleEmails = emails.filter(
+    (e) => !finished[e.id] && (e.needsReply || e.needsRetriage),
+  );
 
   const priorityFiltered = visibleEmails;
 
