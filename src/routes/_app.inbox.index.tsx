@@ -143,16 +143,16 @@ function InboxPage() {
           return (
             <article
               key={e.id}
-              className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)]"
+              className="rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)] h-[240px] overflow-hidden flex flex-col"
             >
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start justify-between gap-4 shrink-0">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <p className="text-sm font-medium text-foreground">{e.sender}</p>
                     <p className="text-xs text-muted-foreground">{e.senderEmail}</p>
                     <span className="text-xs text-muted-foreground">· {e.time}</span>
                   </div>
-                  <h3 className="mt-1 text-base font-medium text-foreground">{e.subject}</h3>
+                  <h3 className="mt-1 text-base font-medium text-foreground line-clamp-1">{e.subject}</h3>
                 </div>
                 <div className="flex flex-col items-end gap-1.5 shrink-0">
                   <PriorityBadge priority={e.priority} />
@@ -160,31 +160,33 @@ function InboxPage() {
                 </div>
               </div>
 
-              <p className="mt-3 text-sm text-foreground/85 leading-relaxed">{e.summary}</p>
+              <p className="mt-3 text-sm text-foreground/85 leading-relaxed line-clamp-2 shrink-0">{e.summary}</p>
 
-              {e.needsRetriage || !e.suggestedAction ? (
-                <div className="mt-4 rounded-xl border border-dashed border-border/70 bg-cream/40 px-3 py-2.5 flex items-center gap-2">
-                  <RefreshCw className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                  <p className="text-xs text-muted-foreground">
-                    {e.needsRetriage
-                      ? "A newer reply arrived — run triage to refresh the analysis for this message."
-                      : "Not analyzed yet — run triage to generate a suggested action and draft."}
-                  </p>
-                </div>
-              ) : (
-                <div className="mt-4 grid sm:grid-cols-2 gap-3">
-                  <div className="rounded-xl bg-cream/60 border border-border/60 px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Suggested action</p>
-                    <p className="text-xs text-foreground mt-0.5">{e.suggestedAction}</p>
+              <div className="mt-4 flex-1 min-h-0 overflow-hidden">
+                {e.needsRetriage || !e.suggestedAction ? (
+                  <div className="rounded-xl border border-dashed border-border/70 bg-cream/40 px-3 py-2.5 flex items-center gap-2 h-full">
+                    <RefreshCw className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                    <p className="text-xs text-muted-foreground line-clamp-3">
+                      {e.needsRetriage
+                        ? "A newer reply arrived — run triage to refresh the analysis for this message."
+                        : "Not analyzed yet — run triage to generate a suggested action and draft."}
+                    </p>
                   </div>
-                  <div className="rounded-xl bg-cream/60 border border-border/60 px-3 py-2">
-                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Why this matters</p>
-                    <p className="text-xs text-foreground mt-0.5">{e.reason}</p>
+                ) : (
+                  <div className="grid sm:grid-cols-2 gap-3 h-full">
+                    <div className="rounded-xl bg-cream/60 border border-border/60 px-3 py-2 overflow-hidden">
+                      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Suggested action</p>
+                      <p className="text-xs text-foreground mt-0.5 line-clamp-4">{e.suggestedAction}</p>
+                    </div>
+                    <div className="rounded-xl bg-cream/60 border border-border/60 px-3 py-2 overflow-hidden">
+                      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Why this matters</p>
+                      <p className="text-xs text-foreground mt-0.5 line-clamp-4">{e.reason}</p>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
-              <div className="mt-4 flex flex-wrap items-center gap-2">
+              <div className="mt-4 flex flex-wrap items-center gap-2 shrink-0">
                 <Button
                   variant="outline"
                   size="sm"
