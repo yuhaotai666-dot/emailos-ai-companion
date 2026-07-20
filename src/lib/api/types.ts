@@ -123,6 +123,8 @@ export interface ApiUserProfile {
   routines: string[];
   /** Completed the onboarding flow. Account-level, not per-browser. */
   onboarded?: boolean;
+  /** The user's standing directives (Settings → Agent Rules). */
+  agent_rules?: string;
 }
 
 export interface TriageResultApi {

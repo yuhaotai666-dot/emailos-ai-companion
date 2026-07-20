@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/workspace/Common";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Mail, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { useRulesStore } from "@/lib/rules-store";
+import { useRulesStore, useHydrateRules } from "@/lib/rules-store";
 
 export const Route = createFileRoute("/_app/settings")({
   head: () => ({
@@ -147,15 +147,25 @@ function SettingsPage() {
 }
 
 function RulesEditor() {
+  useHydrateRules();
   const { text, setText } = useRulesStore();
   const [draft, setDraft] = useState(text);
+  const [touched, setTouched] = useState(false);
+  // Once the account rules load, seed the editor with them (until the user
+  // starts typing).
+  useEffect(() => {
+    if (!touched) setDraft(text);
+  }, [text, touched]);
   const dirty = draft !== text;
 
   return (
     <div className="grid gap-2">
       <Textarea
         value={draft}
-        onChange={(e) => setDraft(e.target.value)}
+        onChange={(e) => {
+          setTouched(true);
+          setDraft(e.target.value);
+        }}
         rows={10}
         placeholder="Write rules to shape how Ivy behaves. One per line, or free-form."
         className="text-sm bg-background min-h-[220px]"
@@ -176,6 +186,7 @@ function RulesEditor() {
           disabled={!dirty}
           onClick={() => {
             setText(draft);
+            setTouched(false);
             toast.success("Rules saved");
           }}
         >

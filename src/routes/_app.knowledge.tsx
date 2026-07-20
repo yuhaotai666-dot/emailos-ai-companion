@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ChevronDown, ChevronRight, Pencil, Plus, Trash2, X, Check } from "lucide-react";
 import { toast } from "sonner";
-import { useKnowledgeStore } from "@/lib/knowledge-store";
+import { useKnowledgeStore, useHydrateKnowledge } from "@/lib/knowledge-store";
 
 export const Route = createFileRoute("/_app/knowledge")({
   head: () => ({
@@ -19,6 +19,7 @@ export const Route = createFileRoute("/_app/knowledge")({
 });
 
 function KnowledgePage() {
+  useHydrateKnowledge();
   const { bases, addBase, renameBase, deleteBase, addKnowledge, updateKnowledge, deleteKnowledge } =
     useKnowledgeStore();
 
