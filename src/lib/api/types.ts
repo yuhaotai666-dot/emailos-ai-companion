@@ -23,13 +23,13 @@ export interface EmailView {
   needs_retriage?: boolean;
 }
 
-export interface MemorySection {
+export interface KnowledgeSection {
   title: string;
   items: string[];
 }
 
-export interface MemoryProfile {
-  sections: MemorySection[];
+export interface KnowledgeProfile {
+  sections: KnowledgeSection[];
 }
 
 export interface PersonThread {

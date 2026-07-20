@@ -24,6 +24,7 @@ import { Route as AppPowersRouteImport } from './routes/_app.powers'
 import { Route as AppPeopleRouteImport } from './routes/_app.people'
 import { Route as AppMemoryRouteImport } from './routes/_app.memory'
 import { Route as AppMeetingsRouteImport } from './routes/_app.meetings'
+import { Route as AppKnowledgeRouteImport } from './routes/_app.knowledge'
 import { Route as AppInboxRouteImport } from './routes/_app.inbox'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppCalendarRouteImport } from './routes/_app.calendar'
@@ -105,6 +106,11 @@ const AppMeetingsRoute = AppMeetingsRouteImport.update({
   path: '/meetings',
   getParentRoute: () => AppRoute,
 } as any)
+const AppKnowledgeRoute = AppKnowledgeRouteImport.update({
+  id: '/knowledge',
+  path: '/knowledge',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppInboxRoute = AppInboxRouteImport.update({
   id: '/inbox',
   path: '/inbox',
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/calendar': typeof AppCalendarRoute
   '/home': typeof AppHomeRoute
   '/inbox': typeof AppInboxRouteWithChildren
+  '/knowledge': typeof AppKnowledgeRoute
   '/meetings': typeof AppMeetingsRoute
   '/memory': typeof AppMemoryRoute
   '/people': typeof AppPeopleRouteWithChildren
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/calendar': typeof AppCalendarRoute
   '/home': typeof AppHomeRoute
+  '/knowledge': typeof AppKnowledgeRoute
   '/meetings': typeof AppMeetingsRoute
   '/memory': typeof AppMemoryRoute
   '/people': typeof AppPeopleRouteWithChildren
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/_app/calendar': typeof AppCalendarRoute
   '/_app/home': typeof AppHomeRoute
   '/_app/inbox': typeof AppInboxRouteWithChildren
+  '/_app/knowledge': typeof AppKnowledgeRoute
   '/_app/meetings': typeof AppMeetingsRoute
   '/_app/memory': typeof AppMemoryRoute
   '/_app/people': typeof AppPeopleRouteWithChildren
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/home'
     | '/inbox'
+    | '/knowledge'
     | '/meetings'
     | '/memory'
     | '/people'
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/calendar'
     | '/home'
+    | '/knowledge'
     | '/meetings'
     | '/memory'
     | '/people'
@@ -254,6 +265,7 @@ export interface FileRouteTypes {
     | '/_app/calendar'
     | '/_app/home'
     | '/_app/inbox'
+    | '/_app/knowledge'
     | '/_app/meetings'
     | '/_app/memory'
     | '/_app/people'
@@ -384,6 +396,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMeetingsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/knowledge': {
+      id: '/_app/knowledge'
+      path: '/knowledge'
+      fullPath: '/knowledge'
+      preLoaderRoute: typeof AppKnowledgeRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/inbox': {
       id: '/_app/inbox'
       path: '/inbox'
@@ -459,6 +478,7 @@ interface AppRouteChildren {
   AppCalendarRoute: typeof AppCalendarRoute
   AppHomeRoute: typeof AppHomeRoute
   AppInboxRoute: typeof AppInboxRouteWithChildren
+  AppKnowledgeRoute: typeof AppKnowledgeRoute
   AppMeetingsRoute: typeof AppMeetingsRoute
   AppMemoryRoute: typeof AppMemoryRoute
   AppPeopleRoute: typeof AppPeopleRouteWithChildren
@@ -471,6 +491,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppCalendarRoute: AppCalendarRoute,
   AppHomeRoute: AppHomeRoute,
   AppInboxRoute: AppInboxRouteWithChildren,
+  AppKnowledgeRoute: AppKnowledgeRoute,
   AppMeetingsRoute: AppMeetingsRoute,
   AppMemoryRoute: AppMemoryRoute,
   AppPeopleRoute: AppPeopleRouteWithChildren,

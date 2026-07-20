@@ -27,7 +27,7 @@ const items = [
   { title: "Meetings", url: "/meetings", icon: Calendar },
   { title: "Powers", url: "/powers", icon: Zap },
   { title: "People", url: "/people", icon: Users },
-  { title: "Memory", url: "/memory", icon: Brain },
+  { title: "Knowledge", url: "/knowledge", icon: Brain },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 
