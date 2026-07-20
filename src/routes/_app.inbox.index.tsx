@@ -38,7 +38,7 @@ function InboxPage() {
 
   function handleView(e: MockEmail) {
     setOpenEmail(e);
-    setReplyBody(e.draftPreview ?? "");
+    setReplyBody(e.draftBody ?? e.draftPreview ?? "");
   }
 
   function handleSendReply(emailId: string) {
@@ -309,9 +309,9 @@ function InboxPage() {
                   <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
                     Reply to {openEmail.sender}
                   </p>
-                  {openEmail.draftPreview && (
+                  {(openEmail.draftBody ?? openEmail.draftPreview) && (
                     <button
-                      onClick={() => setReplyBody(openEmail.draftPreview ?? "")}
+                      onClick={() => setReplyBody(openEmail.draftBody ?? openEmail.draftPreview ?? "")}
                       className="text-[11px] text-muted-foreground hover:text-foreground"
                     >
                       Reset to Ivy's draft
