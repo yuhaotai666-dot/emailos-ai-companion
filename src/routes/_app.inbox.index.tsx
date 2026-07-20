@@ -308,18 +308,19 @@ function InboxPage() {
               </div>
 
               <div className="border-t border-border bg-cream/30 px-6 py-4 space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
                     Reply to {openEmail.sender}
                   </p>
-                  {(openEmail.draftBody ?? openEmail.draftPreview) && (
-                    <button
-                      onClick={() => setReplyBody(openEmail.draftBody ?? openEmail.draftPreview ?? "")}
-                      className="text-[11px] text-muted-foreground hover:text-foreground"
-                    >
-                      Reset to Ivy's draft
-                    </button>
-                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full h-7 text-[11px] bg-background"
+                    onClick={() => setInstructOpen(true)}
+                  >
+                    <Wand2 className="h-3 w-3 mr-1" />
+                    Reset to Ivy's draft
+                  </Button>
                 </div>
                 <Textarea
                   value={replyBody}
