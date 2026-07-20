@@ -316,10 +316,10 @@ function InboxPage() {
                     variant="outline"
                     size="sm"
                     className="rounded-full h-7 text-[11px] bg-background"
-                    onClick={() => setInstructOpen(true)}
+                    onClick={() => setInstructOpen((o) => !o)}
                   >
                     <Wand2 className="h-3 w-3 mr-1" />
-                    Reset to Ivy's draft
+                    {instructOpen ? "Hide instructions" : "Reset to Ivy's draft"}
                   </Button>
                 </div>
                 <Textarea
