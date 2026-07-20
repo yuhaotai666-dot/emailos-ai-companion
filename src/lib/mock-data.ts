@@ -418,7 +418,7 @@ export const mockContacts = [
   },
 ];
 
-export const mockMemory = {
+export const mockKnowledge = {
   "Communication style": [
     "Concise and action-oriented",
     "Polite but direct",
