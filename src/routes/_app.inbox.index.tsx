@@ -275,7 +275,7 @@ function InboxPage() {
                   <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">
                     Latest message
                   </p>
-                  <div className="rounded-2xl border-2 border-border bg-cream/40 max-h-[620px] overflow-y-auto">
+                  <div className="rounded-2xl border-2 border-border bg-cream/40 max-h-[800px] overflow-y-auto">
                     {/* Gmail-style header: who sent it, to whom, when. */}
                     <div className="flex items-start gap-3 px-6 pt-5 pb-3 border-b border-border/60">
                       <div className="h-9 w-9 rounded-full bg-foreground/10 flex items-center justify-center text-xs font-medium text-foreground shrink-0">
