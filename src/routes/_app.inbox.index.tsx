@@ -32,6 +32,8 @@ function InboxPage() {
   const [openEmail, setOpenEmail] = useState<MockEmail | null>(null);
   const [replyBody, setReplyBody] = useState("");
   const [markedDoneIds, setMarkedDoneIds] = useState<Set<string>>(new Set());
+  const [instructOpen, setInstructOpen] = useState(false);
+  const [instructions, setInstructions] = useState("");
 
   const finished = useFinishedEmailsStore((s) => s.finished);
   const markSent = useFinishedEmailsStore((s) => s.markSent);
