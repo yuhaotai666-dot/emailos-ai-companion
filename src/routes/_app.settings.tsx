@@ -3,6 +3,7 @@ import { useState } from "react";
 import { PageHeader } from "@/components/workspace/Common";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -10,8 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Mail, Plus } from "lucide-react";
+import { Mail, Plus, Trash2, Pencil, Check, X } from "lucide-react";
 import { toast } from "sonner";
+import { useRulesStore, type AgentRule } from "@/lib/rules-store";
 
 export const Route = createFileRoute("/_app/settings")({
   head: () => ({
@@ -87,6 +89,13 @@ function SettingsPage() {
           >
             <Plus className="h-3.5 w-3.5 mr-1" /> Add another account
           </Button>
+        </Section>
+
+        <Section title="Agent Rules">
+          <p className="text-xs text-muted-foreground -mt-2 mb-1">
+            Rules that shape how Ivy behaves. Edit or add rules to steer the agent.
+          </p>
+          <RulesEditor />
         </Section>
 
         <Section title="AI Preferences">
