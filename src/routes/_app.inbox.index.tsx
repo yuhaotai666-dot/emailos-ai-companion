@@ -12,7 +12,8 @@ import { EventFilterBar } from "@/components/workspace/EventFilterBar";
 import { EventLabelPicker } from "@/components/workspace/EventLabelPicker";
 import { ManageEventsDialog } from "@/components/workspace/ManageEventsDialog";
 import { useFinishedEmailsStore } from "@/lib/finished-emails-store";
-import { Send, X, RefreshCw, CheckCircle2 } from "lucide-react";
+import { Send, X, RefreshCw, CheckCircle2, Wand2, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 
 
 export const Route = createFileRoute("/_app/inbox/")({
