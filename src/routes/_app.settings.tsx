@@ -147,94 +147,41 @@ function SettingsPage() {
 }
 
 function RulesEditor() {
-  const { rules, addRule, updateRule, deleteRule } = useRulesStore();
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [draft, setDraft] = useState("");
-
-  const startEdit = (r: AgentRule) => {
-    setEditingId(r.id);
-    setDraft(r.text);
-  };
-  const saveEdit = () => {
-    if (editingId) {
-      updateRule(editingId, draft.trim());
-      toast.success("Rule updated");
-    }
-    setEditingId(null);
-  };
+  const { text, setText } = useRulesStore();
+  const [draft, setDraft] = useState(text);
+  const dirty = draft !== text;
 
   return (
     <div className="grid gap-2">
-      {rules.map((r) => (
-        <div
-          key={r.id}
-          className="rounded-xl bg-cream/60 border border-border/60 px-3 py-2.5"
+      <Textarea
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        rows={10}
+        placeholder="Write rules to shape how Ivy behaves. One per line, or free-form."
+        className="text-sm bg-background min-h-[220px]"
+      />
+      <div className="flex justify-end gap-2">
+        <Button
+          size="sm"
+          variant="ghost"
+          className="rounded-full text-xs"
+          disabled={!dirty}
+          onClick={() => setDraft(text)}
         >
-          {editingId === r.id ? (
-            <div className="grid gap-2">
-              <Textarea
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                className="text-sm bg-background"
-                rows={3}
-              />
-              <div className="flex justify-end gap-1">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="rounded-full text-xs"
-                  onClick={() => setEditingId(null)}
-                >
-                  <X className="h-3.5 w-3.5 mr-1" /> Cancel
-                </Button>
-                <Button
-                  size="sm"
-                  className="rounded-full text-xs"
-                  onClick={saveEdit}
-                >
-                  <Check className="h-3.5 w-3.5 mr-1" /> Save
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-start gap-2">
-              <p className="text-sm text-foreground flex-1 whitespace-pre-wrap">
-                {r.text || <span className="text-muted-foreground italic">Empty rule</span>}
-              </p>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-7 w-7 shrink-0"
-                onClick={() => startEdit(r)}
-              >
-                <Pencil className="h-3.5 w-3.5" />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive"
-                onClick={() => {
-                  deleteRule(r.id);
-                  toast("Rule removed");
-                }}
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          )}
-        </div>
-      ))}
-      <Button
-        variant="ghost"
-        size="sm"
-        className="rounded-full text-xs justify-start"
-        onClick={() => {
-          addRule("");
-          toast("New rule added — edit it below");
-        }}
-      >
-        <Plus className="h-3.5 w-3.5 mr-1" /> Add rule
-      </Button>
+          Reset
+        </Button>
+        <Button
+          size="sm"
+          className="rounded-full text-xs"
+          disabled={!dirty}
+          onClick={() => {
+            setText(draft);
+            toast.success("Rules saved");
+          }}
+        >
+          Save rules
+        </Button>
+      </div>
     </div>
   );
 }
