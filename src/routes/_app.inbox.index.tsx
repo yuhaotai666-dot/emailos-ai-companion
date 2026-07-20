@@ -340,8 +340,8 @@ function InboxPage() {
                     disabled={!replyBody.trim()}
                     onClick={() => openEmail && handleSendReply(openEmail.id)}
                   >
-                    <Send className="h-3.5 w-3.5 mr-1" />
-                    Send reply
+                    <RefreshCw className="h-3.5 w-3.5 mr-1" />
+                    Sync Gmail
                   </Button>
                 </div>
               </div>
