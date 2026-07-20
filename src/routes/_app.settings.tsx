@@ -3,6 +3,7 @@ import { useState } from "react";
 import { PageHeader } from "@/components/workspace/Common";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -10,8 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Mail, Plus } from "lucide-react";
+import { Mail, Plus, Trash2, Pencil, Check, X } from "lucide-react";
 import { toast } from "sonner";
+import { useRulesStore, type AgentRule } from "@/lib/rules-store";
 
 export const Route = createFileRoute("/_app/settings")({
   head: () => ({
@@ -89,6 +91,13 @@ function SettingsPage() {
           </Button>
         </Section>
 
+        <Section title="Agent Rules">
+          <p className="text-xs text-muted-foreground -mt-2 mb-1">
+            Rules that shape how Ivy behaves. Edit or add rules to steer the agent.
+          </p>
+          <RulesEditor />
+        </Section>
+
         <Section title="AI Preferences">
           <div className="rounded-xl bg-cream/60 border border-border/60 px-3 py-2.5 flex items-center justify-between">
             <div>
@@ -133,6 +142,99 @@ function SettingsPage() {
           <ToggleRow label="Meeting summaries" />
         </Section>
       </div>
+    </div>
+  );
+}
+
+function RulesEditor() {
+  const { rules, addRule, updateRule, deleteRule } = useRulesStore();
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draft, setDraft] = useState("");
+
+  const startEdit = (r: AgentRule) => {
+    setEditingId(r.id);
+    setDraft(r.text);
+  };
+  const saveEdit = () => {
+    if (editingId) {
+      updateRule(editingId, draft.trim());
+      toast.success("Rule updated");
+    }
+    setEditingId(null);
+  };
+
+  return (
+    <div className="grid gap-2">
+      {rules.map((r) => (
+        <div
+          key={r.id}
+          className="rounded-xl bg-cream/60 border border-border/60 px-3 py-2.5"
+        >
+          {editingId === r.id ? (
+            <div className="grid gap-2">
+              <Textarea
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                className="text-sm bg-background"
+                rows={3}
+              />
+              <div className="flex justify-end gap-1">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="rounded-full text-xs"
+                  onClick={() => setEditingId(null)}
+                >
+                  <X className="h-3.5 w-3.5 mr-1" /> Cancel
+                </Button>
+                <Button
+                  size="sm"
+                  className="rounded-full text-xs"
+                  onClick={saveEdit}
+                >
+                  <Check className="h-3.5 w-3.5 mr-1" /> Save
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-start gap-2">
+              <p className="text-sm text-foreground flex-1 whitespace-pre-wrap">
+                {r.text || <span className="text-muted-foreground italic">Empty rule</span>}
+              </p>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-7 w-7 shrink-0"
+                onClick={() => startEdit(r)}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive"
+                onClick={() => {
+                  deleteRule(r.id);
+                  toast("Rule removed");
+                }}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          )}
+        </div>
+      ))}
+      <Button
+        variant="ghost"
+        size="sm"
+        className="rounded-full text-xs justify-start"
+        onClick={() => {
+          addRule("");
+          toast("New rule added — edit it below");
+        }}
+      >
+        <Plus className="h-3.5 w-3.5 mr-1" /> Add rule
+      </Button>
     </div>
   );
 }
