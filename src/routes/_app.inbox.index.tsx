@@ -305,6 +305,53 @@ function InboxPage() {
                   </p>
                 </div>
 
+                {instructOpen && (
+                  <div className="rounded-2xl border-2 border-border bg-cream/40 p-5 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-foreground" />
+                      <p className="text-sm font-medium text-foreground">
+                        Tell Ivy how to revise this draft
+                      </p>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Describe the tone, angle, or edits you want. Ivy will regenerate the draft based on your notes.
+                    </p>
+                    <Textarea
+                      value={instructions}
+                      onChange={(e) => setInstructions(e.target.value)}
+                      placeholder="e.g. Make it warmer, mention the timeline, keep it under 4 sentences…"
+                      className="min-h-[160px] resize-none bg-background border-border"
+                    />
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="rounded-full h-8 text-xs"
+                        onClick={() => {
+                          setInstructions("");
+                          setInstructOpen(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="rounded-full h-8 text-xs bg-foreground text-background hover:opacity-90"
+                        onClick={() => {
+                          if (openEmail) {
+                            setReplyBody(openEmail.draftBody ?? openEmail.draftPreview ?? "");
+                          }
+                          toast.success("Ivy is regenerating the draft based on your notes.");
+                          setInstructions("");
+                          setInstructOpen(false);
+                        }}
+                      >
+                        <Wand2 className="h-3.5 w-3.5 mr-1" />
+                        Regenerate draft
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="border-t border-border bg-cream/30 px-6 py-4 space-y-3">
@@ -316,10 +363,10 @@ function InboxPage() {
                     variant="outline"
                     size="sm"
                     className="rounded-full h-7 text-[11px] bg-background"
-                    onClick={() => setInstructOpen(true)}
+                    onClick={() => setInstructOpen((o) => !o)}
                   >
                     <Wand2 className="h-3 w-3 mr-1" />
-                    Reset to Ivy's draft
+                    {instructOpen ? "Hide instructions" : "Reset to Ivy's draft"}
                   </Button>
                 </div>
                 <Textarea
@@ -354,52 +401,6 @@ function InboxPage() {
         </SheetContent>
       </Sheet>
 
-      <Sheet open={instructOpen} onOpenChange={setInstructOpen}>
-        <SheetContent side="left" className="w-full sm:max-w-md p-0 flex flex-col bg-background">
-          <SheetHeader className="px-6 pt-6 pb-4 border-b border-border">
-            <SheetTitle className="font-serif text-xl leading-tight text-foreground flex items-center gap-2">
-              <Sparkles className="h-4 w-4" />
-              Tell Ivy how to revise this draft
-            </SheetTitle>
-            <SheetDescription className="text-xs text-muted-foreground">
-              Describe the tone, angle, or edits you want. Ivy will regenerate the draft based on your notes.
-            </SheetDescription>
-          </SheetHeader>
-          <div className="flex-1 overflow-y-auto px-6 py-5">
-            <Textarea
-              value={instructions}
-              onChange={(e) => setInstructions(e.target.value)}
-              placeholder="e.g. Make it warmer, mention the timeline, keep it under 4 sentences…"
-              className="min-h-[280px] resize-none bg-background border-border"
-            />
-          </div>
-          <div className="border-t border-border bg-cream/30 px-6 py-4 flex items-center justify-end gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="rounded-full h-8 text-xs"
-              onClick={() => setInstructOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              size="sm"
-              className="rounded-full h-8 text-xs bg-foreground text-background hover:opacity-90"
-              onClick={() => {
-                if (openEmail) {
-                  setReplyBody(openEmail.draftBody ?? openEmail.draftPreview ?? "");
-                }
-                toast.success("Ivy is regenerating the draft based on your notes.");
-                setInstructions("");
-                setInstructOpen(false);
-              }}
-            >
-              <Wand2 className="h-3.5 w-3.5 mr-1" />
-              Regenerate draft
-            </Button>
-          </div>
-        </SheetContent>
-      </Sheet>
     </div>
   );
 }
