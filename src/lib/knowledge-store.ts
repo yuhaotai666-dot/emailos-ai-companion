@@ -1,85 +1,89 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { mockMemory } from "./mock-data";
+import { mockKnowledge } from "./mock-data";
 
-export interface MemoryRule {
+export interface KnowledgeEntry {
   id: string;
   title: string;
   detail: string;
 }
 
-export interface MemoryBase {
+export interface KnowledgeBase {
   id: string;
   name: string;
-  rules: MemoryRule[];
+  entries: KnowledgeEntry[];
 }
 
-interface MemoryState {
-  bases: MemoryBase[];
+interface KnowledgeState {
+  bases: KnowledgeBase[];
   addBase: (name: string) => void;
   renameBase: (id: string, name: string) => void;
   deleteBase: (id: string) => void;
-  addRule: (baseId: string, title: string, detail?: string) => void;
-  updateRule: (baseId: string, ruleId: string, patch: Partial<Omit<MemoryRule, "id">>) => void;
-  deleteRule: (baseId: string, ruleId: string) => void;
+  addKnowledge: (baseId: string, title: string, detail?: string) => void;
+  updateKnowledge: (
+    baseId: string,
+    entryId: string,
+    patch: Partial<Omit<KnowledgeEntry, "id">>,
+  ) => void;
+  deleteKnowledge: (baseId: string, entryId: string) => void;
 }
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
 const defaultDetail = (title: string) =>
-  `Detailed guidance for "${title}". Click edit to describe when and how Ivy should apply this rule — examples, tone notes, or exceptions.`;
+  `Detailed guidance for "${title}". Click edit to describe when and how Ivy should apply this knowledge — examples, tone notes, or exceptions.`;
 
-const seed: MemoryBase[] = Object.entries(mockMemory).map(([name, items]) => ({
+const seed: KnowledgeBase[] = Object.entries(mockKnowledge).map(([name, items]) => ({
   id: uid(),
   name,
-  rules: (items as string[]).map((t) => ({
+  entries: (items as string[]).map((t) => ({
     id: uid(),
     title: t,
     detail: defaultDetail(t),
   })),
 }));
 
-export const useMemoryStore = create<MemoryState>()(
+export const useKnowledgeStore = create<KnowledgeState>()(
   persist(
     (set) => ({
       bases: seed,
       addBase: (name) =>
-        set((s) => ({ bases: [...s.bases, { id: uid(), name, rules: [] }] })),
+        set((s) => ({ bases: [...s.bases, { id: uid(), name, entries: [] }] })),
       renameBase: (id, name) =>
         set((s) => ({ bases: s.bases.map((b) => (b.id === id ? { ...b, name } : b)) })),
       deleteBase: (id) => set((s) => ({ bases: s.bases.filter((b) => b.id !== id) })),
-      addRule: (baseId, title, detail) =>
+      addKnowledge: (baseId, title, detail) =>
         set((s) => ({
           bases: s.bases.map((b) =>
             b.id === baseId
               ? {
                   ...b,
-                  rules: [
-                    ...b.rules,
+                  entries: [
+                    ...b.entries,
                     { id: uid(), title, detail: detail ?? defaultDetail(title) },
                   ],
                 }
               : b,
           ),
         })),
-      updateRule: (baseId, ruleId, patch) =>
+      updateKnowledge: (baseId, entryId, patch) =>
         set((s) => ({
           bases: s.bases.map((b) =>
             b.id === baseId
               ? {
                   ...b,
-                  rules: b.rules.map((r) => (r.id === ruleId ? { ...r, ...patch } : r)),
+                  entries: b.entries.map((e) => (e.id === entryId ? { ...e, ...patch } : e)),
                 }
               : b,
           ),
         })),
-      deleteRule: (baseId, ruleId) =>
+      deleteKnowledge: (baseId, entryId) =>
         set((s) => ({
           bases: s.bases.map((b) =>
-            b.id === baseId ? { ...b, rules: b.rules.filter((r) => r.id !== ruleId) } : b,
+            b.id === baseId ? { ...b, entries: b.entries.filter((e) => e.id !== entryId) } : b,
           ),
         })),
     }),
-    { name: "ivy-memory-v1" },
+    { name: "ivy-knowledge-v1" },
   ),
 );

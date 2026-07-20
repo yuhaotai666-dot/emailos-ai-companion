@@ -11,7 +11,7 @@ import type {
   Confidence,
   SourceType,
 } from "@/lib/mock-data";
-import type { ApiMeeting, EmailView, MemoryProfile, PersonView } from "./types";
+import type { ApiMeeting, EmailView, KnowledgeProfile, PersonView } from "./types";
 
 // ---- time helpers -----------------------------------------------------------
 export function relTime(iso: string): string {
@@ -64,8 +64,8 @@ export function toMockEmail(e: EmailView): MockEmail {
   };
 }
 
-// ---- memory -----------------------------------------------------------------
-export function toMemoryRecord(profile: MemoryProfile): Record<string, string[]> {
+// ---- knowledge --------------------------------------------------------------
+export function toKnowledgeRecord(profile: KnowledgeProfile): Record<string, string[]> {
   const record: Record<string, string[]> = {};
   for (const s of profile.sections) record[s.title] = s.items;
   return record;

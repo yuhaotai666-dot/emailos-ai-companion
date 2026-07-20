@@ -132,7 +132,7 @@ function PersonDetail() {
             size="sm"
             variant="outline"
             className="rounded-full text-destructive hover:text-destructive"
-            onClick={() => toast("Profile deleted from memory.")}
+            onClick={() => toast("Profile deleted from knowledge.")}
           >
             <Trash2 className="h-3.5 w-3.5" /> Delete
           </Button>

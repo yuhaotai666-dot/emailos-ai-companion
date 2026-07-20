@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import {
   mockEmails,
   mockMeetings,
-  mockMemory,
+  mockKnowledge,
   mockPeople,
   mockUser,
   homeNeedToKnow,
@@ -15,13 +15,13 @@ import {
   type Person,
 } from "@/lib/mock-data";
 import { req, withFallback } from "./client";
-import { toMemoryRecord, toMockEmail, toMockMeeting, toPerson, relTime } from "./mappers";
+import { toKnowledgeRecord, toMockEmail, toMockMeeting, toPerson, relTime } from "./mappers";
 import type {
   ApiMeeting,
   ApiUserProfile,
   DailyBrief,
   EmailView,
-  MemoryProfile,
+  KnowledgeProfile,
   PersonView,
   TodoView,
 } from "./types";
@@ -37,13 +37,13 @@ export function useEmails() {
   });
 }
 
-export function useMemoryProfile() {
+export function useKnowledgeProfile() {
   return useQuery<Record<string, string[]>>({
-    queryKey: ["memory-profile"],
+    queryKey: ["knowledge-profile"],
     queryFn: () =>
       withFallback(
-        async () => toMemoryRecord(await req<MemoryProfile>("/api/memory/profile")),
-        mockMemory,
+        async () => toKnowledgeRecord(await req<KnowledgeProfile>("/api/knowledge/profile")),
+        mockKnowledge,
       ),
   });
 }

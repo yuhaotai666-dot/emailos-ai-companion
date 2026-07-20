@@ -6,30 +6,30 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ChevronDown, ChevronRight, Pencil, Plus, Trash2, X, Check } from "lucide-react";
 import { toast } from "sonner";
-import { useMemoryStore } from "@/lib/memory-store";
+import { useKnowledgeStore } from "@/lib/knowledge-store";
 
-export const Route = createFileRoute("/_app/memory")({
+export const Route = createFileRoute("/_app/knowledge")({
   head: () => ({
     meta: [
-      { title: "Memory — Ivy" },
+      { title: "Knowledge — Ivy" },
       { name: "description", content: "Ivy learns how you work, but you stay in control." },
     ],
   }),
-  component: MemoryPage,
+  component: KnowledgePage,
 });
 
-function MemoryPage() {
-  const { bases, addBase, renameBase, deleteBase, addRule, updateRule, deleteRule } =
-    useMemoryStore();
+function KnowledgePage() {
+  const { bases, addBase, renameBase, deleteBase, addKnowledge, updateKnowledge, deleteKnowledge } =
+    useKnowledgeStore();
 
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [editingBase, setEditingBase] = useState<string | null>(null);
   const [baseDraft, setBaseDraft] = useState("");
-  const [addingRuleFor, setAddingRuleFor] = useState<string | null>(null);
-  const [newRuleTitle, setNewRuleTitle] = useState("");
-  const [editingRule, setEditingRule] = useState<string | null>(null);
-  const [ruleTitleDraft, setRuleTitleDraft] = useState("");
-  const [ruleDetailDraft, setRuleDetailDraft] = useState("");
+  const [addingKnowledgeFor, setAddingKnowledgeFor] = useState<string | null>(null);
+  const [newKnowledgeTitle, setNewKnowledgeTitle] = useState("");
+  const [editingKnowledge, setEditingKnowledge] = useState<string | null>(null);
+  const [knowledgeTitleDraft, setKnowledgeTitleDraft] = useState("");
+  const [knowledgeDetailDraft, setKnowledgeDetailDraft] = useState("");
   const [showNewBase, setShowNewBase] = useState(false);
   const [newBaseName, setNewBaseName] = useState("");
 
@@ -37,9 +37,9 @@ function MemoryPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-6 lg:px-10 py-10">
-      <PageHeader title="Memory" subtitle="Ivy learns how you work, but you stay in control." />
+      <PageHeader title="Knowledge" subtitle="Ivy learns how you work, but you stay in control." />
       <p className="mb-6 text-xs text-muted-foreground">
-        Each knowledge base groups rules Ivy follows. Click a rule to see or edit the details.
+        Each knowledge base groups knowledge Ivy follows. Click an entry to see or edit the details.
       </p>
 
       <div className="grid gap-4">
@@ -98,7 +98,7 @@ function MemoryPage() {
                     <button
                       className="text-muted-foreground hover:text-destructive p-1"
                       onClick={() => {
-                        if (confirm(`Delete "${base.name}" and all its rules?`)) {
+                        if (confirm(`Delete "${base.name}" and all its knowledge?`)) {
                           deleteBase(base.id);
                           toast("Knowledge base deleted.");
                         }
@@ -112,17 +112,17 @@ function MemoryPage() {
               </div>
 
               <ul className="mt-3 grid gap-2">
-                {base.rules.map((rule) => {
-                  const open = expanded[rule.id];
-                  const isEditingR = editingRule === rule.id;
+                {base.entries.map((entry) => {
+                  const open = expanded[entry.id];
+                  const isEditingK = editingKnowledge === entry.id;
                   return (
                     <li
-                      key={rule.id}
+                      key={entry.id}
                       className="rounded-xl bg-cream/60 border border-border/60"
                     >
                       <div className="px-3 py-2 flex items-start gap-2">
                         <button
-                          onClick={() => toggle(rule.id)}
+                          onClick={() => toggle(entry.id)}
                           className="mt-0.5 text-muted-foreground hover:text-foreground"
                           aria-label="Toggle detail"
                         >
@@ -132,29 +132,29 @@ function MemoryPage() {
                             <ChevronRight className="h-3.5 w-3.5" />
                           )}
                         </button>
-                        {isEditingR ? (
+                        {isEditingK ? (
                           <Input
-                            value={ruleTitleDraft}
-                            onChange={(e) => setRuleTitleDraft(e.target.value)}
+                            value={knowledgeTitleDraft}
+                            onChange={(e) => setKnowledgeTitleDraft(e.target.value)}
                             className="flex-1 h-8 bg-background text-sm"
                           />
                         ) : (
                           <button
-                            onClick={() => toggle(rule.id)}
+                            onClick={() => toggle(entry.id)}
                             className="flex-1 text-left text-sm text-foreground"
                           >
-                            {rule.title}
+                            {entry.title}
                           </button>
                         )}
-                        {!isEditingR && (
+                        {!isEditingK && (
                           <>
                             <button
                               className="text-muted-foreground hover:text-foreground p-1"
                               onClick={() => {
-                                setEditingRule(rule.id);
-                                setRuleTitleDraft(rule.title);
-                                setRuleDetailDraft(rule.detail);
-                                setExpanded((e) => ({ ...e, [rule.id]: true }));
+                                setEditingKnowledge(entry.id);
+                                setKnowledgeTitleDraft(entry.title);
+                                setKnowledgeDetailDraft(entry.detail);
+                                setExpanded((e) => ({ ...e, [entry.id]: true }));
                               }}
                               aria-label="Edit"
                             >
@@ -163,8 +163,8 @@ function MemoryPage() {
                             <button
                               className="text-muted-foreground hover:text-destructive p-1"
                               onClick={() => {
-                                deleteRule(base.id, rule.id);
-                                toast("Rule deleted.");
+                                deleteKnowledge(base.id, entry.id);
+                                toast("Knowledge deleted.");
                               }}
                               aria-label="Delete"
                             >
@@ -174,26 +174,26 @@ function MemoryPage() {
                         )}
                       </div>
 
-                      {(open || isEditingR) && (
+                      {(open || isEditingK) && (
                         <div className="px-3 pb-3 pl-9">
-                          {isEditingR ? (
+                          {isEditingK ? (
                             <>
                               <Textarea
-                                value={ruleDetailDraft}
-                                onChange={(e) => setRuleDetailDraft(e.target.value)}
+                                value={knowledgeDetailDraft}
+                                onChange={(e) => setKnowledgeDetailDraft(e.target.value)}
                                 className="min-h-[100px] bg-background text-sm"
-                                placeholder="Detailed requirements — when and how Ivy should apply this rule."
+                                placeholder="Detailed requirements — when and how Ivy should apply this knowledge."
                               />
                               <div className="mt-2 flex gap-2">
                                 <Button
                                   size="sm"
                                   onClick={() => {
-                                    updateRule(base.id, rule.id, {
-                                      title: ruleTitleDraft.trim() || rule.title,
-                                      detail: ruleDetailDraft,
+                                    updateKnowledge(base.id, entry.id, {
+                                      title: knowledgeTitleDraft.trim() || entry.title,
+                                      detail: knowledgeDetailDraft,
                                     });
-                                    setEditingRule(null);
-                                    toast.success("Rule updated.");
+                                    setEditingKnowledge(null);
+                                    toast.success("Knowledge updated.");
                                   }}
                                 >
                                   Save
@@ -201,7 +201,7 @@ function MemoryPage() {
                                 <Button
                                   size="sm"
                                   variant="ghost"
-                                  onClick={() => setEditingRule(null)}
+                                  onClick={() => setEditingKnowledge(null)}
                                 >
                                   Cancel
                                 </Button>
@@ -209,7 +209,7 @@ function MemoryPage() {
                             </>
                           ) : (
                             <p className="text-xs text-muted-foreground whitespace-pre-wrap leading-relaxed">
-                              {rule.detail}
+                              {entry.detail}
                             </p>
                           )}
                         </div>
@@ -218,31 +218,31 @@ function MemoryPage() {
                   );
                 })}
 
-                {addingRuleFor === base.id ? (
+                {addingKnowledgeFor === base.id ? (
                   <li className="rounded-xl bg-background border border-border px-3 py-2 flex items-center gap-2">
                     <Input
-                      value={newRuleTitle}
-                      onChange={(e) => setNewRuleTitle(e.target.value)}
-                      placeholder="Rule name, e.g. Always confirm publish window"
+                      value={newKnowledgeTitle}
+                      onChange={(e) => setNewKnowledgeTitle(e.target.value)}
+                      placeholder="Knowledge name, e.g. Always confirm publish window"
                       className="h-8 bg-background text-sm"
                       autoFocus
                       onKeyDown={(e) => {
-                        if (e.key === "Enter" && newRuleTitle.trim()) {
-                          addRule(base.id, newRuleTitle.trim());
-                          setNewRuleTitle("");
-                          setAddingRuleFor(null);
-                          toast.success("Rule added.");
+                        if (e.key === "Enter" && newKnowledgeTitle.trim()) {
+                          addKnowledge(base.id, newKnowledgeTitle.trim());
+                          setNewKnowledgeTitle("");
+                          setAddingKnowledgeFor(null);
+                          toast.success("Knowledge added.");
                         }
                       }}
                     />
                     <Button
                       size="sm"
                       onClick={() => {
-                        if (newRuleTitle.trim()) {
-                          addRule(base.id, newRuleTitle.trim());
-                          setNewRuleTitle("");
-                          setAddingRuleFor(null);
-                          toast.success("Rule added.");
+                        if (newKnowledgeTitle.trim()) {
+                          addKnowledge(base.id, newKnowledgeTitle.trim());
+                          setNewKnowledgeTitle("");
+                          setAddingKnowledgeFor(null);
+                          toast.success("Knowledge added.");
                         }
                       }}
                     >
@@ -252,8 +252,8 @@ function MemoryPage() {
                       size="sm"
                       variant="ghost"
                       onClick={() => {
-                        setAddingRuleFor(null);
-                        setNewRuleTitle("");
+                        setAddingKnowledgeFor(null);
+                        setNewKnowledgeTitle("");
                       }}
                     >
                       Cancel
@@ -262,10 +262,10 @@ function MemoryPage() {
                 ) : (
                   <li>
                     <button
-                      onClick={() => setAddingRuleFor(base.id)}
+                      onClick={() => setAddingKnowledgeFor(base.id)}
                       className="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
                     >
-                      <Plus className="h-3.5 w-3.5" /> Add rule
+                      <Plus className="h-3.5 w-3.5" /> Add knowledge
                     </button>
                   </li>
                 )}
