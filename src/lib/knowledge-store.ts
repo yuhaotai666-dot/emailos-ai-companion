@@ -68,7 +68,7 @@ export const useKnowledgeStore = create<KnowledgeState>()(
         })),
       updateKnowledge: (baseId, entryId, patch) =>
         set((s) => ({
-          bases: s.bases.map((e((b) =>
+          bases: s.bases.map((b) =>
             b.id === baseId
               ? {
                   ...b,
