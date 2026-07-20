@@ -12,7 +12,8 @@ import { EventFilterBar } from "@/components/workspace/EventFilterBar";
 import { EventLabelPicker } from "@/components/workspace/EventLabelPicker";
 import { ManageEventsDialog } from "@/components/workspace/ManageEventsDialog";
 import { useFinishedEmailsStore } from "@/lib/finished-emails-store";
-import { Send, X, RefreshCw, CheckCircle2 } from "lucide-react";
+import { Send, X, RefreshCw, CheckCircle2, Wand2, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 
 
 export const Route = createFileRoute("/_app/inbox/")({
@@ -31,6 +32,8 @@ function InboxPage() {
   const [openEmail, setOpenEmail] = useState<MockEmail | null>(null);
   const [replyBody, setReplyBody] = useState("");
   const [markedDoneIds, setMarkedDoneIds] = useState<Set<string>>(new Set());
+  const [instructOpen, setInstructOpen] = useState(false);
+  const [instructions, setInstructions] = useState("");
 
   const finished = useFinishedEmailsStore((s) => s.finished);
   const markSent = useFinishedEmailsStore((s) => s.markSent);
@@ -305,18 +308,19 @@ function InboxPage() {
               </div>
 
               <div className="border-t border-border bg-cream/30 px-6 py-4 space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-2">
                   <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
                     Reply to {openEmail.sender}
                   </p>
-                  {(openEmail.draftBody ?? openEmail.draftPreview) && (
-                    <button
-                      onClick={() => setReplyBody(openEmail.draftBody ?? openEmail.draftPreview ?? "")}
-                      className="text-[11px] text-muted-foreground hover:text-foreground"
-                    >
-                      Reset to Ivy's draft
-                    </button>
-                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full h-7 text-[11px] bg-background"
+                    onClick={() => setInstructOpen(true)}
+                  >
+                    <Wand2 className="h-3 w-3 mr-1" />
+                    Reset to Ivy's draft
+                  </Button>
                 </div>
                 <Textarea
                   value={replyBody}
@@ -347,6 +351,53 @@ function InboxPage() {
               </div>
             </>
           )}
+        </SheetContent>
+      </Sheet>
+
+      <Sheet open={instructOpen} onOpenChange={setInstructOpen}>
+        <SheetContent side="left" className="w-full sm:max-w-md p-0 flex flex-col bg-background">
+          <SheetHeader className="px-6 pt-6 pb-4 border-b border-border">
+            <SheetTitle className="font-serif text-xl leading-tight text-foreground flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              Tell Ivy how to revise this draft
+            </SheetTitle>
+            <SheetDescription className="text-xs text-muted-foreground">
+              Describe the tone, angle, or edits you want. Ivy will regenerate the draft based on your notes.
+            </SheetDescription>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-6 py-5">
+            <Textarea
+              value={instructions}
+              onChange={(e) => setInstructions(e.target.value)}
+              placeholder="e.g. Make it warmer, mention the timeline, keep it under 4 sentences…"
+              className="min-h-[280px] resize-none bg-background border-border"
+            />
+          </div>
+          <div className="border-t border-border bg-cream/30 px-6 py-4 flex items-center justify-end gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="rounded-full h-8 text-xs"
+              onClick={() => setInstructOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              className="rounded-full h-8 text-xs bg-foreground text-background hover:opacity-90"
+              onClick={() => {
+                if (openEmail) {
+                  setReplyBody(openEmail.draftBody ?? openEmail.draftPreview ?? "");
+                }
+                toast.success("Ivy is regenerating the draft based on your notes.");
+                setInstructions("");
+                setInstructOpen(false);
+              }}
+            >
+              <Wand2 className="h-3.5 w-3.5 mr-1" />
+              Regenerate draft
+            </Button>
+          </div>
         </SheetContent>
       </Sheet>
     </div>
