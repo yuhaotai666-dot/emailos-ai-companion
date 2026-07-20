@@ -11,9 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Mail, Plus, Trash2, Pencil, Check, X } from "lucide-react";
+import { Mail, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { useRulesStore, type AgentRule } from "@/lib/rules-store";
+import { useRulesStore } from "@/lib/rules-store";
 
 export const Route = createFileRoute("/_app/settings")({
   head: () => ({
