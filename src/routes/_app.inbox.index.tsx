@@ -15,13 +15,9 @@ import { useFinishedEmailsStore } from "@/lib/finished-emails-store";
 import { Send, X, RefreshCw, CheckCircle2, Wand2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
-
 export const Route = createFileRoute("/_app/inbox/")({
   head: () => ({
-    meta: [
-      { title: "Email — Ivy" },
-      { name: "description", content: "Your email, turned into a calm review queue." },
-    ],
+    meta: [{ title: "Email — Ivy" }, { name: "description", content: "Your email, turned into a calm review queue." }],
   }),
   component: InboxPage,
 });
@@ -73,9 +69,7 @@ function InboxPage() {
   // newsletters / no-action mail is filtered out. A freshly-arrived reply that
   // hasn't been triaged yet (needsRetriage) is kept — it's an inbound message
   // awaiting analysis, not something to hide.
-  const visibleEmails = emails.filter(
-    (e) => !finished[e.id] && (e.needsReply || e.needsRetriage),
-  );
+  const visibleEmails = emails.filter((e) => !finished[e.id] && (e.needsReply || e.needsRetriage));
 
   const priorityFiltered = visibleEmails;
 
@@ -88,15 +82,13 @@ function InboxPage() {
     return c;
   }, [priorityFiltered, emailEventMap]);
 
-  const filtered = priorityFiltered.filter((e) =>
-    eventFilter === "all" ? true : emailEventMap[e.id] === eventFilter,
-  );
+  const filtered = priorityFiltered.filter((e) => (eventFilter === "all" ? true : emailEventMap[e.id] === eventFilter));
 
   // Review-queue order: High → Medium → Low → untriaged. Priority values are
   // lowercased by the mapper; untriaged messages (no real classification yet)
   // sink to the bottom. Stable sort keeps newest-first within a priority band.
   const PRIORITY_RANK: Record<string, number> = { high: 0, medium: 1, low: 2 };
-  const rankOf = (e: MockEmail) => (e.triaged ? PRIORITY_RANK[e.priority] ?? 2 : 3);
+  const rankOf = (e: MockEmail) => (e.triaged ? (PRIORITY_RANK[e.priority] ?? 2) : 3);
   const sorted = [...filtered].sort((a, b) => rankOf(a) - rankOf(b));
 
   return (
@@ -121,17 +113,10 @@ function InboxPage() {
             disabled={runTriage.isPending}
             onClick={() => runTriage.mutate()}
           >
-            <RefreshCw
-              className={"h-3.5 w-3.5 mr-1" + (runTriage.isPending ? " animate-spin" : "")}
-            />
+            <RefreshCw className={"h-3.5 w-3.5 mr-1" + (runTriage.isPending ? " animate-spin" : "")} />
             {runTriage.isPending ? "Running…" : "Run triage"}
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            className="rounded-full h-8 text-xs"
-            onClick={handleRefresh}
-          >
+          <Button variant="outline" size="sm" className="rounded-full h-8 text-xs" onClick={handleRefresh}>
             <RefreshCw className="h-3.5 w-3.5 mr-1" />
             Refresh
           </Button>
@@ -143,7 +128,6 @@ function InboxPage() {
           </Button>
         </div>
       </div>
-
 
       <div className="grid gap-3">
         {sorted.map((e) => {
@@ -222,9 +206,7 @@ function InboxPage() {
                 </Button>
                 <EventLabelPicker emailId={e.id} onManage={() => setManageOpen(true)} />
                 {ev && (
-                  <span className="ml-auto text-[11px] text-muted-foreground hidden sm:inline">
-                    Event: {ev.name}
-                  </span>
+                  <span className="ml-auto text-[11px] text-muted-foreground hidden sm:inline">Event: {ev.name}</span>
                 )}
               </div>
             </article>
@@ -242,10 +224,7 @@ function InboxPage() {
       <ManageEventsDialog open={manageOpen} onOpenChange={setManageOpen} />
 
       <Sheet open={!!openEmail} onOpenChange={(o) => !o && setOpenEmail(null)}>
-        <SheetContent
-          side="right"
-          className="w-full sm:max-w-3xl p-0 flex flex-col bg-background"
-        >
+        <SheetContent side="right" className="w-full sm:max-w-3xl p-0 flex flex-col bg-background">
           {openEmail && (
             <>
               <SheetHeader className="px-6 pt-6 pb-4 border-b border-border">
@@ -275,10 +254,8 @@ function InboxPage() {
 
               <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
                 <div>
-                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">
-                    Latest message
-                  </p>
-                  <div className="rounded-2xl border-2 border-border bg-cream/40 min-h-[900px] max-h-[2400px] overflow-y-auto">
+                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-2">Latest message</p>
+                  <div className="rounded-2xl border-2 border-border bg-cream/40 min-h-[900px] max-h-[1200px] overflow-y-auto">
                     {/* Gmail-style header: who sent it, to whom, when. */}
                     <div className="flex items-start gap-3 px-6 pt-5 pb-3 border-b border-border/60">
                       <div className="h-9 w-9 rounded-full bg-foreground/10 flex items-center justify-center text-xs font-medium text-foreground shrink-0">
@@ -287,17 +264,13 @@ function InboxPage() {
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-foreground truncate">
                           {openEmail.sender}{" "}
-                          <span className="font-normal text-muted-foreground">
-                            &lt;{openEmail.senderEmail}&gt;
-                          </span>
+                          <span className="font-normal text-muted-foreground">&lt;{openEmail.senderEmail}&gt;</span>
                         </p>
                         <p className="text-xs text-muted-foreground">to me · {openEmail.time}</p>
                       </div>
                     </div>
                     <div className="px-6 py-4 text-sm text-foreground/90 leading-relaxed whitespace-pre-wrap">
-                      {openEmail.bodyPreview
-                        ? openEmail.bodyPreview
-                        : `${openEmail.summary}\n\n${openEmail.reason}`}
+                      {openEmail.bodyPreview ? openEmail.bodyPreview : `${openEmail.summary}\n\n${openEmail.reason}`}
                     </div>
                   </div>
                   <p className="mt-2 text-[11px] text-muted-foreground">
@@ -309,9 +282,7 @@ function InboxPage() {
                   <div className="rounded-2xl border-2 border-border bg-cream/40 p-5 space-y-3">
                     <div className="flex items-center gap-2">
                       <Sparkles className="h-4 w-4 text-foreground" />
-                      <p className="text-sm font-medium text-foreground">
-                        Tell Ivy how to revise this draft
-                      </p>
+                      <p className="text-sm font-medium text-foreground">Tell Ivy how to revise this draft</p>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Describe the tone, angle, or edits you want. Ivy will regenerate the draft based on your notes.
@@ -400,7 +371,6 @@ function InboxPage() {
           )}
         </SheetContent>
       </Sheet>
-
     </div>
   );
 }
