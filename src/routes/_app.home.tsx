@@ -39,9 +39,13 @@ import {
 export const Route = createFileRoute("/_app/home")({
   head: () => ({
     meta: [
-      { title: "Home — Ivy" },
+      { title: "Home — Your Daily Briefing — Ivy" },
       { name: "description", content: "Your daily briefing, tasks, and what needs your attention." },
+      { property: "og:title", content: "Home — Your Daily Briefing — Ivy" },
+      { property: "og:description", content: "Your daily briefing, tasks, and what needs your attention." },
+      { property: "og:url", content: "https://personal-postman-ai.lovable.app/home" },
     ],
+    links: [{ rel: "canonical", href: "https://personal-postman-ai.lovable.app/home" }],
   }),
   component: HomePage,
 });
