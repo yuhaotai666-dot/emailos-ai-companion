@@ -11,7 +11,11 @@ export const Route = createFileRoute("/_app/inbox/finished")({
     meta: [
       { title: "Task finished — Ivy" },
       { name: "description", content: "Emails you've sent replies to or marked as done." },
+      { property: "og:title", content: "Task finished — Ivy" },
+      { property: "og:description", content: "Emails you've sent replies to or marked as done." },
+      { property: "og:url", content: "https://personal-postman-ai.lovable.app/inbox/finished" },
     ],
+    links: [{ rel: "canonical", href: "https://personal-postman-ai.lovable.app/inbox/finished" }],
   }),
   component: FinishedPage,
 });

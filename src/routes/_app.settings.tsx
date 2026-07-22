@@ -20,7 +20,11 @@ export const Route = createFileRoute("/_app/settings")({
     meta: [
       { title: "Settings — Ivy" },
       { name: "description", content: "Preferences, safety, and integrations for Ivy." },
+      { property: "og:title", content: "Settings — Ivy" },
+      { property: "og:description", content: "Preferences, safety, and integrations for Ivy." },
+      { property: "og:url", content: "https://personal-postman-ai.lovable.app/settings" },
     ],
+    links: [{ rel: "canonical", href: "https://personal-postman-ai.lovable.app/settings" }],
   }),
   component: SettingsPage,
 });

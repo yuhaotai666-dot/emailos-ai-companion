@@ -10,7 +10,12 @@ export const Route = createFileRoute("/auth")({
     meta: [
       { title: "Sign in — Ivy" },
       { name: "description", content: "Sign in to your Ivy account." },
+      { property: "og:title", content: "Sign in — Ivy" },
+      { property: "og:description", content: "Sign in to your Ivy account." },
+      { property: "og:url", content: "https://personal-postman-ai.lovable.app/auth" },
+      { name: "robots", content: "noindex" },
     ],
+    links: [{ rel: "canonical", href: "https://personal-postman-ai.lovable.app/auth" }],
   }),
   component: AuthPage,
 });

@@ -13,7 +13,11 @@ export const Route = createFileRoute("/_app/knowledge")({
     meta: [
       { title: "Knowledge — Ivy" },
       { name: "description", content: "Ivy learns how you work, but you stay in control." },
+      { property: "og:title", content: "Knowledge — Ivy" },
+      { property: "og:description", content: "Ivy learns how you work, but you stay in control." },
+      { property: "og:url", content: "https://personal-postman-ai.lovable.app/knowledge" },
     ],
+    links: [{ rel: "canonical", href: "https://personal-postman-ai.lovable.app/knowledge" }],
   }),
   component: KnowledgePage,
 });
