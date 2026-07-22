@@ -1,13 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { type MockEmail } from "@/lib/mock-data";
-import { useEmails, useRunTriage } from "@/lib/api/queries";
+import {
+  useEmails,
+  useRunTriage,
+  reviseDraft,
+  pushDraftToGmail,
+  type SuggestedRule,
+} from "@/lib/api/queries";
 import { PageHeader } from "@/components/workspace/Common";
 import { PriorityBadge, CategoryBadge } from "@/components/workspace/Badges";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { useEventsStore } from "@/lib/events-store";
+import { useKnowledgeStore } from "@/lib/knowledge-store";
 import { EventFilterBar } from "@/components/workspace/EventFilterBar";
 import { EventLabelPicker } from "@/components/workspace/EventLabelPicker";
 import { ManageEventsDialog } from "@/components/workspace/ManageEventsDialog";
@@ -30,18 +37,70 @@ function InboxPage() {
   const [markedDoneIds, setMarkedDoneIds] = useState<Set<string>>(new Set());
   const [instructOpen, setInstructOpen] = useState(false);
   const [instructions, setInstructions] = useState("");
+  const [revising, setRevising] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [suggestedRule, setSuggestedRule] = useState<SuggestedRule | null>(null);
 
   const finished = useFinishedEmailsStore((s) => s.finished);
   const markSent = useFinishedEmailsStore((s) => s.markSent);
   const markDone = useFinishedEmailsStore((s) => s.markDone);
+  const addKnowledge = useKnowledgeStore((s) => s.addKnowledge);
 
   function handleView(e: MockEmail) {
     setOpenEmail(e);
     setReplyBody(e.draftBody ?? e.draftPreview ?? "");
+    setInstructions("");
+    setInstructOpen(false);
+    setSuggestedRule(null);
   }
 
-  function handleSendReply(emailId: string) {
-    markSent(emailId);
+  async function handleRevise() {
+    const msg = instructions.trim();
+    if (!msg || !openEmail?.draftId) return;
+    setRevising(true);
+    try {
+      const res = await reviseDraft(openEmail.draftId, msg);
+      setReplyBody(res.draft.draft_body);
+      setSuggestedRule(res.suggested_rule ?? null);
+      toast.success(res.reply_text || "Draft updated.");
+      setInstructions("");
+      setInstructOpen(false);
+    } catch {
+      toast.error("Couldn't revise — is the backend running?");
+    } finally {
+      setRevising(false);
+    }
+  }
+
+  function handleSaveRule() {
+    if (!suggestedRule) return;
+    addKnowledge(
+      suggestedRule.section || "Reply preferences",
+      suggestedRule.situation,
+      suggestedRule.preference,
+    );
+    toast.success("Saved to Knowledge — future emails like this will use it");
+    setSuggestedRule(null);
+  }
+
+  async function handleSendReply(email: MockEmail) {
+    // The app never sends — it pushes the reply into the user's Gmail Drafts.
+    if (email.draftId) {
+      setSyncing(true);
+      try {
+        const res = await pushDraftToGmail(email.draftId, replyBody);
+        toast.success(
+          res.synced
+            ? "Saved to your Gmail Drafts — open Gmail to send"
+            : res.detail || "Couldn't sync to Gmail",
+        );
+      } catch {
+        toast.error("Couldn't reach the backend to sync");
+      } finally {
+        setSyncing(false);
+      }
+    }
+    markSent(email.id);
     setOpenEmail(null);
   }
 
@@ -308,17 +367,33 @@ function InboxPage() {
                       <Button
                         size="sm"
                         className="rounded-full h-8 text-xs bg-foreground text-background hover:opacity-90"
-                        onClick={() => {
-                          if (openEmail) {
-                            setReplyBody(openEmail.draftBody ?? openEmail.draftPreview ?? "");
-                          }
-                          toast.success("Ivy is regenerating the draft based on your notes.");
-                          setInstructions("");
-                          setInstructOpen(false);
-                        }}
+                        disabled={revising || !instructions.trim() || !openEmail?.draftId}
+                        onClick={handleRevise}
                       >
                         <Wand2 className="h-3.5 w-3.5 mr-1" />
-                        Regenerate draft
+                        {revising ? "Revising…" : "Regenerate draft"}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {suggestedRule && (
+                  <div className="rounded-2xl border border-dashed border-border bg-cream/40 px-4 py-3">
+                    <p className="text-xs text-foreground">Apply this to future emails like this?</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                      {suggestedRule.situation}: {suggestedRule.preference}
+                    </p>
+                    <div className="mt-2 flex gap-2">
+                      <Button size="sm" className="rounded-full h-7 text-[11px]" onClick={handleSaveRule}>
+                        Save rule
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="rounded-full h-7 text-[11px]"
+                        onClick={() => setSuggestedRule(null)}
+                      >
+                        Dismiss
                       </Button>
                     </div>
                   </div>
@@ -359,11 +434,11 @@ function InboxPage() {
                   <Button
                     size="sm"
                     className="rounded-full h-8 text-xs bg-foreground text-background hover:opacity-90"
-                    disabled={!replyBody.trim()}
-                    onClick={() => openEmail && handleSendReply(openEmail.id)}
+                    disabled={!replyBody.trim() || syncing}
+                    onClick={() => openEmail && handleSendReply(openEmail)}
                   >
                     <Send className="h-3.5 w-3.5 mr-1" />
-                    Send reply
+                    {syncing ? "Saving…" : "Save to Gmail Drafts"}
                   </Button>
                 </div>
               </div>

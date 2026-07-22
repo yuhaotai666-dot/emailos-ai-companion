@@ -188,6 +188,39 @@ export async function fetchPerson(personId: string): Promise<Person | null> {
   }
 }
 
+// ---- draft revise (conversational) + Gmail draft sync ----
+export interface SuggestedRule {
+  situation: string;
+  preference: string;
+  section?: string;
+}
+
+export interface ReviseResult {
+  draft: { id: string; draft_body: string; subject_suggestion?: string | null };
+  reply_text: string;
+  suggested_rule?: SuggestedRule | null;
+}
+
+/** Send one revise message; returns the updated draft + agent ack + maybe a rule. */
+export async function reviseDraft(draftId: string, message: string): Promise<ReviseResult> {
+  return req<ReviseResult>(`/api/drafts/${draftId}/revise`, {
+    method: "POST",
+    body: JSON.stringify({ message }),
+  });
+}
+
+/** Push the (edited) reply into the user's Gmail Drafts. Never sends. */
+export async function pushDraftToGmail(
+  draftId: string,
+  body: string,
+  subject?: string,
+): Promise<{ gmail_draft_id?: string; synced: boolean; detail?: string }> {
+  return req(`/api/drafts/${draftId}/push-to-gmail`, {
+    method: "POST",
+    body: JSON.stringify({ body, subject }),
+  });
+}
+
 /** Kick off the agent loop, then refresh everything derived from it. */
 export function useRunTriage() {
   const qc = useQueryClient();

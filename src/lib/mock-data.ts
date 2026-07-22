@@ -23,6 +23,8 @@ export interface MockEmail {
   draftPreview?: string;
   /** Full draft text for the reply editor (draftPreview is truncated). */
   draftBody?: string;
+  /** Backend draft id (for revise / push-to-Gmail). */
+  draftId?: string;
   confidence?: number;
   filter?: string;
   /** Real snippet of the email body (present when data comes from the backend). */
