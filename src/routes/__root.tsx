@@ -90,6 +90,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "A calm, personal AI assistant for email. Drafts, follow-ups, and priorities — ready for review.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "Ivy" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
@@ -100,6 +101,30 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap",
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              name: "Ivy",
+              url: "https://personal-postman-ai.lovable.app",
+              description:
+                "Ivy is a personal AI email chief of staff that drafts replies and surfaces what matters, without sending on its own.",
+            },
+            {
+              "@type": "WebSite",
+              name: "Ivy",
+              url: "https://personal-postman-ai.lovable.app",
+              description:
+                "Personal AI email chief of staff — a calm review queue for your inbox.",
+            },
+          ],
+        }),
       },
     ],
   }),

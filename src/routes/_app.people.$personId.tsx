@@ -20,18 +20,39 @@ import {
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/people/$personId")({
-  head: ({ loaderData }) => {
+  head: ({ params, loaderData }) => {
     const p = (loaderData as { person?: Person } | undefined)?.person;
+    const url = `https://personal-postman-ai.lovable.app/people/${params.personId}`;
+    const title = p ? `${p.name} — People — Ivy` : "Person — Ivy";
+    const description = p ? p.aiDescription : "AI-generated relationship profile in Ivy.";
+    const meta: Array<Record<string, string>> = [
+      { title },
+      { name: "description", content: description },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:url", content: url },
+      { property: "og:type", content: "profile" },
+    ];
+    const scripts = p
+      ? [
+          {
+            type: "application/ld+json",
+            children: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "ProfilePage",
+              mainEntity: {
+                "@type": "Person",
+                name: p.name,
+                description: p.aiDescription,
+              },
+            }),
+          },
+        ]
+      : undefined;
     return {
-      meta: [
-        { title: p ? `${p.name} — People — Ivy` : "Person — Ivy" },
-        {
-          name: "description",
-          content: p
-            ? p.aiDescription
-            : "AI-generated relationship profile in Ivy.",
-        },
-      ],
+      meta,
+      links: [{ rel: "canonical", href: url }],
+      ...(scripts ? { scripts } : {}),
     };
   },
   loader: async ({ params }) => {

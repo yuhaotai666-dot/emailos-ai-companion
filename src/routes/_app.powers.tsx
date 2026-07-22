@@ -40,8 +40,10 @@ export const Route = createFileRoute("/_app/powers")({
           "Routines, skills, and integrations that let Ivy take work off your plate.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://personal-postman-ai.lovable.app/powers" },
       { name: "twitter:card", content: "summary" },
     ],
+    links: [{ rel: "canonical", href: "https://personal-postman-ai.lovable.app/powers" }],
   }),
   component: PowersPage,
 });

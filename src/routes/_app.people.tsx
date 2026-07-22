@@ -15,7 +15,15 @@ export const Route = createFileRoute("/_app/people")({
         content:
           "AI-generated relationship profiles built from your email, meetings, and follow-ups.",
       },
+      { property: "og:title", content: "People — Ivy" },
+      {
+        property: "og:description",
+        content:
+          "AI-generated relationship profiles built from your email, meetings, and follow-ups.",
+      },
+      { property: "og:url", content: "https://personal-postman-ai.lovable.app/people" },
     ],
+    links: [{ rel: "canonical", href: "https://personal-postman-ai.lovable.app/people" }],
   }),
   component: PeoplePage,
 });

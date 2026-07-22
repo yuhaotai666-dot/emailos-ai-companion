@@ -15,7 +15,15 @@ export const Route = createFileRoute("/_app/meetings")({
         content:
           "Meeting prep, notes, and AI-generated follow-up emails ready to send to attendees.",
       },
+      { property: "og:title", content: "Meetings — Ivy" },
+      {
+        property: "og:description",
+        content:
+          "Meeting prep, notes, and AI-generated follow-up emails ready to send to attendees.",
+      },
+      { property: "og:url", content: "https://personal-postman-ai.lovable.app/meetings" },
     ],
+    links: [{ rel: "canonical", href: "https://personal-postman-ai.lovable.app/meetings" }],
   }),
   component: MeetingsPage,
 });

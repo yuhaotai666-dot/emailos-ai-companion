@@ -18,7 +18,9 @@ export const Route = createFileRoute("/_app/todo")({
         property: "og:description",
         content: "Personal action items your meeting assistant pulled out for you.",
       },
+      { property: "og:url", content: "https://personal-postman-ai.lovable.app/todo" },
     ],
+    links: [{ rel: "canonical", href: "https://personal-postman-ai.lovable.app/todo" }],
   }),
   component: TodoPage,
 });

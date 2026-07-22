@@ -13,7 +13,9 @@ export const Route = createFileRoute("/_app/calendar")({
       { name: "description", content: "Your meetings and email-driven events in one calm view." },
       { property: "og:title", content: "Calendar — Ivy" },
       { property: "og:description", content: "Your meetings and email-driven events in one calm view." },
+      { property: "og:url", content: "https://personal-postman-ai.lovable.app/calendar" },
     ],
+    links: [{ rel: "canonical", href: "https://personal-postman-ai.lovable.app/calendar" }],
   }),
   component: CalendarPage,
 });

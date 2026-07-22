@@ -24,7 +24,14 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/inbox/")({
   head: () => ({
-    meta: [{ title: "Email — Ivy" }, { name: "description", content: "Your email, turned into a calm review queue." }],
+    meta: [
+      { title: "Email — Ivy" },
+      { name: "description", content: "Your email, turned into a calm review queue." },
+      { property: "og:title", content: "Email — Ivy" },
+      { property: "og:description", content: "Your email, turned into a calm review queue." },
+      { property: "og:url", content: "https://personal-postman-ai.lovable.app/inbox" },
+    ],
+    links: [{ rel: "canonical", href: "https://personal-postman-ai.lovable.app/inbox" }],
   }),
   component: InboxPage,
 });
