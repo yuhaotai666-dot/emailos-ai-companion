@@ -180,6 +180,7 @@ function HomePage() {
           </div>
 
           <h1 className="mt-3 font-serif text-4xl sm:text-5xl text-foreground leading-tight">
+            <span className="sr-only">Home — Your daily briefing. </span>
             {greeting}, {userName}.{" "}
             {brief
               ? `You have ${brief.needsAttention} email${brief.needsAttention === 1 ? "" : "s"} that need your attention.`

@@ -1,0 +1,7 @@
+# Ivy
+
+> Ivy is a personal AI email chief of staff. It turns your inbox into a calm review queue, drafts replies, and surfaces what matters — without ever sending on its own.
+
+## Pages
+
+- [Home](/): What Ivy is and how it works.

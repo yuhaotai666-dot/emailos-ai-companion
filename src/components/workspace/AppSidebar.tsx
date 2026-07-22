@@ -121,6 +121,7 @@ export function AppSidebar() {
           </div>
           <button
             onClick={handleSignOut}
+            aria-label="Sign out"
             title="Sign out"
             className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-sidebar-accent transition"
           >

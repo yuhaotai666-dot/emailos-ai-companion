@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Disallow: /auth
+Disallow: /onboarding
+Disallow: /home
+Disallow: /inbox
+Disallow: /calendar
+Disallow: /todo
+Disallow: /meetings
+Disallow: /people
+Disallow: /powers
+Disallow: /knowledge
+Disallow: /settings
+
+Sitemap: https://personal-postman-ai.lovable.app/sitemap.xml
